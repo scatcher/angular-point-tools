@@ -9,9 +9,6 @@ var tsd = require('tsd');
 var log = require('gulp-util').log;
 
 module.exports = function(projectDir, paths) {
-
-    log(paths.tsdJson);
-
     var tsdApi = new tsd.getAPI(paths.tsdJson);
 
     gulp.task('ts', function() {

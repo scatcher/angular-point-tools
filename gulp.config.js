@@ -1,34 +1,38 @@
-var log = require('gulp-util').log;
+'use strict';
 
-module.exports = function (directory) {
-    var projectDir = directory ? directory + '/' : './';
-    var tmp = projectDir + '.tmp/';
-    var app = projectDir + 'app/';
-    var test = projectDir + 'test/';
-
+module.exports = function (apToolsDir, projectDir, projectConfig) {
+    var tmp = projectConfig.tmp || projectDir + '.tmp/';
+    var app = projectConfig.app || projectDir + 'app/';
+    var test = projectConfig.test || projectDir + 'test/';
+    var tools = projectConfig.tools || projectDir + 'tools/';
 
     var bower = {
-
         json: require(projectDir + 'bower.json'),
         directory: projectDir + 'bower_components/',
         ignorePath: '../..'
     };
 
-    var tools = projectDir + 'tools/';
-    var offlineXMLName = "offlineXML.js";
     var typings = tools + 'typings';
+    var offlineXMLDir = tmp + 'offlineXML';
 
     var config = {
         appTypeScriptReferences: typings + '/app.d.ts',
         bower: bower,
         build: projectDir + "dist/",
         client: app,
+        distjs: [ app + "common/appModule.js" ],
         docs: projectDir + "docs/",
-        gulpFolder: tools + 'gulp',
+        gulpFolder: apToolsDir + 'gulp',
         index: app + "index.html",
         lessOutput: app + 'styles/css',
+        offlineXMLConstant: 'apCachedXML',
+        offlineXMLName: 'offlineXML.js',
+        offlineXMLDir: offlineXMLDir,
+        offlineXMLSrc: [ projectDir + 'xml-cache/', bower.directory + 'angular-point/test/mock/xml/'],
         packageJson: projectDir + 'package.json',
+        projectless: app + "styles/less/*.less",
         report: projectDir + "report/",
+        tmp: tmp,
         tsdJson: projectDir + 'tsd.json',
         tsFiles: [app + '**/*.ts', './node_modules/angular-point-tools/angular-point-ts/**/*.ts'],
         tsOutput: tmp + 'serve/',
@@ -39,14 +43,12 @@ module.exports = function (directory) {
             app + "**/*.html",
             "!" + app + "index.html"
         ],
-        offlineXMLName: offlineXMLName,
         projectcss: [
             app + "styles/**/*.css",
             bower.directory + "angular-point-discussion-thread/dist/apDiscussionThread.css",
             "!" + app + "styles/**/bootstrap.css",
             "!" + app + "styles/**/bower.css"
         ],
-        projectless: app + "styles/less/*.less",
         projectjs: [
             app + "**/*.js",
             "!" + app + "common/appModule.js",
@@ -57,7 +59,6 @@ module.exports = function (directory) {
             test + "**/*.spec.js",
             app + "**/*.spec.js"
         ],
-        tmp: tmp,
         fonts: [
             bower.directory + "font-awesome/fonts/*",
             bower.directory + "bootstrap/fonts/*",
@@ -81,25 +82,38 @@ module.exports = function (directory) {
         ],
         devjs: [
             bower.directory + "chance/chance.js",
-            "./test/mocks/**/*.js",
+            offlineXMLDir + '/*.js',
+            test + "mocks/**/*.js",
             bower.directory + "angular-mocks/angular-mocks.js",
             bower.directory + "angular-point/test/mock/apMockBackend.js"
         ],
-        distjs: [
-            app + "common/appModule.js"
-        ],
         modules: [
-            bower.directory + "angular-point/dist/angular-point.js",
-            bower.directory + "angular-point-attachments/dist/apAttachments.js",
-            bower.directory + "angular-point-discussion-thread/dist/apDiscussionThread.js",
-            bower.directory + "angular-point-modal/dist/apModalService.js",
-            bower.directory + "angular-point-group-manager/dist/apGroupManager.js",
-            bower.directory + "angular-point-lookup-cache/dist/index.js",
-            bower.directory + "angular-point-form-control/dist/apInputControl.js",
-            bower.directory + "angular-point-offline-generator/dist/ap-offline-generator.js",
-            bower.directory + "angular-point-sync/dist/index.js"
+            bower.directory + "angular-point/dist/angular-point.js"
+        ],
+        vendorjs: [
+            bower.directory + "moment/moment.js",
+            bower.directory + "lodash/lodash.js",
+            bower.directory + "angular-ui-router/release/angular-ui-router.js",
+            bower.directory + "angular-bootstrap/ui-bootstrap.js",
+            bower.directory + "angular-bootstrap/ui-bootstrap-tpls.js",
+            bower.directory + "angular-ui-select/dist/select.js",
+            bower.directory + "angular-ui-date/src/date.js",
+            bower.directory + "angular-toastr/dist/angular-toastr.js",
+            bower.directory + "angular-toastr/dist/angular-toastr.tpls.min.js",
+            bower.directory + "angular-loading-bar/build/loading-bar.js",
+            bower.directory + "angular-elastic/elastic.js"
+        ],
+        vendorcss: [
+            bower.directory + "angular-ui-select/dist/select.css",
+            bower.directory + "angular-toastr/dist/angular-toastr.css",
+            bower.directory + "angular-loading-bar/build/loading-bar.css",
+            bower.directory + "font-awesome/css/font-awesome.min.css",
+            app + "styles/**/*bootstrap.css",
+            app + "styles/**/*bower.css"
         ]
+
     };
+
 
     return config;
 };

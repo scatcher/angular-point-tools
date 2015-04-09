@@ -1,11 +1,11 @@
 'use strict';
 
 var gulp = require('gulp');
-var config = require('../../gulp.config')();
 var $ = require('gulp-load-plugins')({
     pattern: ['gulp-*', 'main-bower-files']
 });
 var _ = require('lodash');
+var log = require('gulp-util').log;
 
 
 module.exports = function(projectDir, paths) {
@@ -15,6 +15,7 @@ module.exports = function(projectDir, paths) {
         var injectOptions = {ignorePath: 'app/'};
 
         return gulp.src(paths.client + 'index.html')
+            .pipe($.plumber())
             .pipe(injectRelative('vendorjs', injectOptions))
             .pipe(injectRelative('cdnjs', injectOptions))
             //.pipe($.inject($.order(sortOutput, {base: config.tmp + '/serve'}), {name: 'inject-ts'}))
