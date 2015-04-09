@@ -1,4 +1,3 @@
-/// <reference path="../../tools/typings/app.d.ts" />
 /// <reference path="Model.ts" />
 
 module ap {

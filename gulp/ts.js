@@ -1,62 +1,52 @@
 'use strict';
 
 var gulp = require('gulp');
-var config = require('../../gulp.config')();
 var $ = require('gulp-load-plugins')({
     pattern: ['gulp-*', 'main-bower-files']
 });
 
 var tsd = require('tsd');
-var tsdJson = 'tsd.json';
-var tsdApi = new tsd.getAPI(tsdJson);
+var log = require('gulp-util').log;
 
-module.exports = function() {
+module.exports = function(projectDir, paths) {
 
-    /**
-     * Generates the app.d.ts references file dynamically from all application *.ts files.
-     * TODO This currently breaks order so don't use
-     */
-    gulp.task('gen-ts-refs', ['ts'], function () {
-        var target = gulp.src(config.appTypeScriptReferences);
-        var sources = gulp.src(config.tsFiles, {read: false});
-        return target.pipe($.inject(sources, {
-            starttag: '//{',
-            endtag: '//}',
-            transform: function (filepath) {
-                return '/// <reference path="../..' + filepath + '" />';
-            }
-        })).pipe(gulp.dest(config.typings));
-    });
+    log(paths.tsdJson);
+
+    var tsdApi = new tsd.getAPI(paths.tsdJson);
 
     gulp.task('ts', function() {
-        return gulp.src(config.tsFiles)
+        return gulp.src(paths.tsFiles)
             .pipe($.sourcemaps.init())
             .pipe($.tslint())
             .pipe($.tslint.report('prose', { emitError: false }))
             .pipe($.typescript({sortOutput: true, module: true, declarationFiles:false}))
             .pipe($.sourcemaps.write())
-            .pipe($.toJson({filename: config.tmp + '/sortOutput.json', relative:true}))
-            .pipe(gulp.dest(config.tmp + '/serve/'))
+            .pipe($.toJson({filename: paths.tmp + paths.tsOutputName, relative:true}))
+            .pipe(gulp.dest(paths.tmp + '/serve/'))
             .pipe($.size());
-
     });
 
     //gulp.task('inject-ts', function() {
-    gulp.task('inject-ts', ['ts'], function() {
-        var sortOutput = require('../../' + config.tmp + 'sortOutput.json');
+    gulp.task('inject-ts', ['clean-ts', 'ts'], function() {
+        var sortOutput = require(paths.tmp + paths.tsOutputName);
 
-        var tempScripts = gulp.src([config.tsOutput + '**/*.js'])
+        var tempScripts = gulp.src([paths.tsOutput + '**/*.js'])
             //.pipe($.angularFilesort());
-            .pipe($.order(sortOutput, {base: config.tsOutput}),{read: false});
+            .pipe($.order(sortOutput, {base: paths.tsOutput}),{read: false});
 
-        gulp.src(config.client + 'index.html')
+        gulp.src(paths.client + 'index.html')
             .pipe($.inject(tempScripts, {name: 'inject-ts', addRootSlash: false}))
-            .pipe(gulp.dest(config.client));
+            .pipe(gulp.dest(paths.client));
+    });
+
+    gulp.task('clean-ts', function () {
+        var del = require('del');
+        return del([paths.tsOutput]);
     });
 
 
     gulp.task('tsd:install', function () {
-        var bower = require('./bower.json');
+        var bower = paths.bower.json;
 
         var dependencies = [].concat(
             Object.keys(bower.dependencies),
@@ -105,5 +95,20 @@ module.exports = function() {
 
     gulp.task('tsd', ['tsd:install']);
 
+    /**
+     * Generates the app.d.ts references file dynamically from all application *.ts files.
+     * TODO This currently breaks order so don't use
+     */
+    //gulp.task('gen-ts-refs', ['ts'], function () {
+    //    var target = gulp.src(config.appTypeScriptReferences);
+    //    var sources = gulp.src(config.tsFiles, {read: false});
+    //    return target.pipe($.inject(sources, {
+    //        starttag: '//{',
+    //        endtag: '//}',
+    //        transform: function (filepath) {
+    //            return '/// <reference path="../..' + filepath + '" />';
+    //        }
+    //    })).pipe(gulp.dest(config.typings));
+    //});
 
 };

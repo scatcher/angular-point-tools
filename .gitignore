@@ -1,0 +1,16 @@
+# Dependencies
+node_modules
+bower_components
+
+# Build
+dist
+.tmp
+
+# Styles CSS gets built all the time so just store the LESS
+app/styles/css
+
+# IDE
+.idea
+
+
+npm-debug.log
