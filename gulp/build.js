@@ -11,7 +11,6 @@ module.exports = function (projectDir, paths) {
     var pkg = require(paths.packageJson);
 
     gulp.task('build', [
-        'templatecache',
         'html',
         'images',
         'fonts',
@@ -29,13 +28,13 @@ module.exports = function (projectDir, paths) {
             .src(paths.htmltemplates)
             .pipe($.bytediff.start())
             .pipe($.minifyHtml({empty: true}))
-            .pipe($.angularTemplatecache('scripts/templates.js', {
+            .pipe($.angularTemplatecache(paths.templateCache, {
                 module: pkg.module,
                 standalone: false,
                 root: ''
             }))
             .pipe($.bytediff.stop(bytediffFormatter))
-            .pipe(gulp.dest(paths.build));
+            .pipe(gulp.dest(paths.tmp));
     });
 
     gulp.task('html', ['inject-dist'], function () {

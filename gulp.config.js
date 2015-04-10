@@ -3,8 +3,11 @@
 module.exports = function (apToolsDir, projectDir, projectConfig) {
     var tmp = projectConfig.tmp || projectDir + '.tmp/';
     var app = projectConfig.app || projectDir + 'app/';
+    var buildDir = projectDir + "dist/";
+    var templateCache = 'templateCache.js';
     var test = projectConfig.test || projectDir + 'test/';
     var tools = projectConfig.tools || projectDir + 'tools/';
+    var tsOutput = tmp + 'serve/';
 
     var bower = {
         json: require(projectDir + 'bower.json'),
@@ -18,9 +21,10 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
     var config = {
         appTypeScriptReferences: typings + '/app.d.ts',
         bower: bower,
-        build: projectDir + "dist/",
+        bowerJson: projectDir + 'bower.json',
+        build: buildDir,
         client: app,
-        distjs: [ app + "common/appModule.js" ],
+        distjs: [ tmp + templateCache],
         docs: projectDir + "docs/",
         gulpFolder: apToolsDir + 'gulp',
         index: app + "index.html",
@@ -32,10 +36,11 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         packageJson: projectDir + 'package.json',
         projectless: app + "styles/less/*.less",
         report: projectDir + "report/",
+        templateCache: templateCache,
         tmp: tmp,
         tsdJson: projectDir + 'tsd.json',
         tsFiles: [app + '**/*.ts', './node_modules/angular-point-tools/angular-point-ts/**/*.ts'],
-        tsOutput: tmp + 'serve/',
+        tsOutput: tsOutput,
         tsOutputName: 'sortOutput.json',
         typings: typings,
 
@@ -50,8 +55,8 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
             "!" + app + "styles/**/bower.css"
         ],
         projectjs: [
+            app + "**/*.module.js",
             app + "**/*.js",
-            "!" + app + "common/appModule.js",
             "!" + app + "**/*.spec.js",
             "!" + app + "**/*.mock.js"
         ],
@@ -83,7 +88,6 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         devjs: [
             bower.directory + "chance/chance.js",
             offlineXMLDir + '/*.js',
-            test + "mocks/**/*.js",
             bower.directory + "angular-mocks/angular-mocks.js",
             bower.directory + "angular-point/test/mock/apMockBackend.js"
         ],

@@ -52,7 +52,7 @@ module.exports = function(projectDir, paths) {
     });
 
 
-    gulp.task('serve', ['inject-ts', 'watch']);
+    gulp.task('serve', ['watch']);
 
 
 };

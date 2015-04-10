@@ -10,7 +10,7 @@ var log = require('gulp-util').log;
 
 module.exports = function(projectDir, paths) {
 
-    gulp.task('inject-dev', ['cacheXML'], function () {
+    gulp.task('inject-dev', ['cacheXML', 'inject-ts', 'templatecache'], function () {
         /** We want to make all links relative to app so remove the app/ prefix on injected references */
         var injectOptions = {ignorePath: 'app/'};
 
@@ -33,7 +33,7 @@ module.exports = function(projectDir, paths) {
 
 
 
-    gulp.task('inject-dist', ['styles'], function () {
+    gulp.task('inject-dist', ['styles', 'inject-ts'], function () {
         var googlecdn = require('gulp-google-cdn');
 
         return gulp.src(paths.client + 'index.html')
@@ -52,6 +52,33 @@ module.exports = function(projectDir, paths) {
             .pipe(gulp.dest(paths.client));
     });
 
+
+    //function injectModuleDependencies(mode) {
+    //    var dependencies;
+    //
+    //    switch(mode) {
+    //        case 'dev':
+    //            dependencies = [].concat(paths.appDependencies, paths.devDependencies);
+    //            break;
+    //        case 'dist':
+    //            dependencies = paths.appDependencies;
+    //            break;
+    //    }
+    //
+    //    if(dependencies) {
+    //        var target = gulp.src(paths.appModule);
+    //        //var sources = gulp.src(paths.tsFiles, {read: false});
+    //        return target.pipe($.inject(dependencies, {
+    //            starttag: '//{',
+    //            endtag: '//}',
+    //            transform: function (moduleName) {
+    //                return '"' + moduleName + '"';
+    //            }
+    //        })).pipe(gulp.dest('./'));
+    //    }
+    //}
+
+
     /**
      * @name injectNG
      * @description Looks for a named JS block in index.html and inserts links to all matching
@@ -60,7 +87,7 @@ module.exports = function(projectDir, paths) {
      * @param {string} pathName Used to find the applicable inject block in the html. 'test' would look for a
      * "<!-- inject-test:js -->" block.
      * @param {object} options
-     * @param {string|string[]} [options.src=config[pathName]] Location to find the files to inject.
+     * @param {string|string[]} [options.src=paths[pathName]] Location to find the files to inject.
      * @param {string} [options.ignorePath] Remove from the beginning of the file reference to make relative.  In
      * dev mode we remove 'app/' so we can run gulp serve relative to the app directory.
      */
@@ -82,7 +109,7 @@ module.exports = function(projectDir, paths) {
      * @param {string} pathName Used to find the applicable inject block in the html. 'test' would look for a
      * "<!-- inject-test:js -->" block.
      * @param {object} options
-     * @param {string|string[]} [options.src=config[pathName]] Location to find the files to inject.
+     * @param {string|string[]} [options.src=paths[pathName]] Location to find the files to inject.
      * @param {string} [options.ignorePath] Remove from the begining of the file reference to make relative.  In
      * dev mode we remove 'app/' so we can run gulp serve relative to the app directory.
      */
@@ -98,14 +125,14 @@ module.exports = function(projectDir, paths) {
 
     //gulp.task('build-vendor', function() {
 //
-//    return gulp.src(config.index)
+//    return gulp.src(paths.index)
 //        .pipe($.plumber())
-//        .pipe($.inject(gulp.src(config.vendorjs, {read: false}), {addRootSlash: false}))
+//        .pipe($.inject(gulp.src(paths.vendorjs, {read: false}), {addRootSlash: false}))
 //        //.pipe($.bytediff.start())
 //        //.pipe($.uglify({mangle: true}))
 //        //.pipe($.bytediff.stop(bytediffFormatter))
 //        //.pipe(injectRelative('vendorjs', injectOptions))
-//        .pipe(gulp.dest(config.client));
+//        .pipe(gulp.dest(paths.client));
 //});
 
 

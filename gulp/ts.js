@@ -31,7 +31,7 @@ module.exports = function(projectDir, paths) {
             //.pipe($.angularFilesort());
             .pipe($.order(sortOutput, {base: paths.tsOutput}),{read: false});
 
-        gulp.src(paths.client + 'index.html')
+        return gulp.src(paths.client + 'index.html')
             .pipe($.inject(tempScripts, {name: 'inject-ts', addRootSlash: false}))
             .pipe(gulp.dest(paths.client));
     });

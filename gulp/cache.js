@@ -7,12 +7,11 @@ var log = require('gulp-util').log;
 
 
 module.exports = function (projectDir, paths) {
-    var pkg = require(paths.packageJson);
 
     //TODO Make cacheXML logic use gulp.src and process as a stream instead of use the current sync approach
     gulp.task('cacheXML', function () {
         createJSON({
-            moduleName: pkg.module,
+            moduleName: 'angularPoint',
             constantName: paths.offlineXMLConstant,
             fileName: paths.offlineXMLName,
             dest: paths.offlineXMLDir,
