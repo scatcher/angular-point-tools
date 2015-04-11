@@ -5,40 +5,42 @@ var $ = require('gulp-load-plugins')({
     pattern: ['gulp-*', 'main-bower-files']
 });
 
+var sourcemaps = require('gulp-sourcemaps');
+var tslint = require('gulp-tslint');
 var tsd = require('tsd');
 var log = require('gulp-util').log;
+var typescript = require('gulp-typescript')
 
 module.exports = function(projectDir, paths) {
     var tsdApi = new tsd.getAPI(paths.tsdJson);
 
     gulp.task('ts', function() {
         return gulp.src(paths.tsFiles)
-            .pipe($.sourcemaps.init())
-            .pipe($.tslint())
-            .pipe($.tslint.report('prose', { emitError: false }))
-            .pipe($.typescript({sortOutput: true, module: true, declarationFiles:false}))
-            .pipe($.sourcemaps.write())
-            .pipe($.toJson({filename: paths.tmp + paths.tsOutputName, relative:true}))
-            .pipe(gulp.dest(paths.tmp + '/serve/'))
+            .pipe(sourcemaps.init())
+            .pipe(tslint())
+            .pipe(tslint.report('prose', { emitError: false }))
+            .pipe(typescript({sortOutput: true, declarationFiles:true}))
+            .pipe(sourcemaps.write())
+            .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative:true}))
+            .pipe(gulp.dest(paths.serverDir))
             .pipe($.size());
     });
 
-    //gulp.task('inject-ts', function() {
-    gulp.task('inject-ts', ['clean-ts', 'ts'], function() {
-        var sortOutput = require(paths.tmp + paths.tsOutputName);
+    gulp.task('inject-ts', ['clean-server', 'ts'], function() {
+        var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
 
-        var tempScripts = gulp.src([paths.tsOutput + '**/*.js'])
+        var tempScripts = gulp.src([paths.serverDir + '**/*.js'])
             //.pipe($.angularFilesort());
-            .pipe($.order(sortOutput, {base: paths.tsOutput}),{read: false});
+            .pipe($.order(sortOutput, {base: paths.server}),{read: false});
 
-        return gulp.src(paths.client + 'index.html')
+        return gulp.src(paths.appDir + 'index.html')
             .pipe($.inject(tempScripts, {name: 'inject-ts', addRootSlash: false}))
-            .pipe(gulp.dest(paths.client));
+            .pipe(gulp.dest(paths.app));
     });
 
-    gulp.task('clean-ts', function () {
+    gulp.task('clean-server', function () {
         var del = require('del');
-        return del([paths.tsOutput]);
+        return del([paths.server]);
     });
 
 

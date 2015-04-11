@@ -8,7 +8,7 @@ var $ = require('gulp-load-plugins')({
 var log = $.util.log;
 
 module.exports = function (projectDir, paths) {
-    var pkg = require(paths.packageJson);
+    //var pkg = require(paths.packageJson);
 
     gulp.task('build', [
         'html',
@@ -23,18 +23,18 @@ module.exports = function (projectDir, paths) {
      */
     gulp.task('templatecache', function () {
         log('Creating an AngularJS $templateCache');
-
+        log(paths.htmltemplates);
         return gulp
             .src(paths.htmltemplates)
             .pipe($.bytediff.start())
             .pipe($.minifyHtml({empty: true}))
             .pipe($.angularTemplatecache(paths.templateCache, {
-                module: pkg.module,
-                standalone: false,
+                module: paths.templatesModule,
+                standalone: true,
                 root: ''
             }))
             .pipe($.bytediff.stop(bytediffFormatter))
-            .pipe(gulp.dest(paths.tmp));
+            .pipe(gulp.dest(projectDir + '.tmp'));
     });
 
     gulp.task('html', ['inject-dist'], function () {
@@ -43,7 +43,7 @@ module.exports = function (projectDir, paths) {
         var assets;
 
         return gulp.src(paths.index)
-            .pipe(assets = $.useref.assets({searchPath: '.'}))
+            .pipe(assets = $.useref.assets({searchPath: paths.userefSearchPaths}))
 
             .pipe(jsFilter)
             //.pipe($.ngAnnotate({add: true, single_quotes: true}))

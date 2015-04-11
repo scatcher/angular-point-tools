@@ -12,9 +12,9 @@ module.exports = function(projectDir, paths) {
 
     gulp.task('inject-dev', ['cacheXML', 'inject-ts', 'templatecache'], function () {
         /** We want to make all links relative to app so remove the app/ prefix on injected references */
-        var injectOptions = {ignorePath: 'app/'};
+        var injectOptions = {}; //{ignorePath: 'app/'};
 
-        return gulp.src(paths.client + 'index.html')
+        return gulp.src(paths.appDir + 'index.html')
             .pipe($.plumber())
             .pipe(injectRelative('vendorjs', injectOptions))
             .pipe(injectRelative('cdnjs', injectOptions))
@@ -28,15 +28,15 @@ module.exports = function(projectDir, paths) {
                 'href="bower_components/jquery-ui'))
             .pipe(injectRelative('projectcss', injectOptions))
             .pipe(injectRelative('vendorcss', injectOptions))
-            .pipe(gulp.dest(paths.client));
+            .pipe(gulp.dest(paths.app));
     });
 
 
 
-    gulp.task('inject-dist', ['styles', 'inject-ts'], function () {
+    gulp.task('inject-dist', ['styles', 'inject-ts', 'templatecache'], function () {
         var googlecdn = require('gulp-google-cdn');
 
-        return gulp.src(paths.client + 'index.html')
+        return gulp.src(paths.appDir + 'index.html')
             .pipe(injectRelative('vendorjs'))
             .pipe(injectRelative('cdnjs'))
             .pipe(injectNG('environmentjs', {src: paths.distjs}))
@@ -49,7 +49,7 @@ module.exports = function(projectDir, paths) {
                 'href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0'))
             .pipe(injectRelative('projectcss'))
             .pipe(injectRelative('vendorcss'))
-            .pipe(gulp.dest(paths.client));
+            .pipe(gulp.dest(paths.app));
     });
 
 
@@ -97,7 +97,7 @@ module.exports = function(projectDir, paths) {
             addRootSlash: false,
             src: options && options.src ? options.src : paths[pathName]
         };
-        var opts = _.extend({}, defaults, options);
+        var opts = _.assign({}, defaults, options);
 
         return $.inject(gulp.src(opts.src).pipe($.angularFilesort()), opts);
     }
@@ -119,8 +119,8 @@ module.exports = function(projectDir, paths) {
             addRootSlash: false,
             src: options && options.src ? options.src : paths[pathName]
         };
-        var opts = _.extend({}, defaults, options);
-        return $.inject(gulp.src(opts.src, {read: false}), opts);
+        var opts = _.assign({}, defaults, options);
+        return $.inject(gulp.src(opts.src, {read: false, dot:true}), opts);
     }
 
     //gulp.task('build-vendor', function() {

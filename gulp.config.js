@@ -1,13 +1,24 @@
 'use strict';
 
+var _ = require('lodash');
+
 module.exports = function (apToolsDir, projectDir, projectConfig) {
-    var tmp = projectConfig.tmp || projectDir + '.tmp/';
-    var app = projectConfig.app || projectDir + 'app/';
+    var appFolderName = 'app';
+    var app = projectConfig.appDir || projectDir + appFolderName,
+        appDir = app + '/',
+        test = projectConfig.test || projectDir + 'test',
+        testDir = test + '/',
+        tmp = projectConfig.tmp || projectDir + '.tmp',
+        tmpDir = tmp + '/',
+        tools = projectConfig.tools || projectDir + 'tools',
+        toolsDir = tmp + '/';
+
+
     var buildDir = projectDir + "dist/";
     var templateCache = 'templateCache.js';
-    var test = projectConfig.test || projectDir + 'test/';
-    var tools = projectConfig.tools || projectDir + 'tools/';
-    var tsOutput = tmp + 'serve/';
+    var server = tmpDir + 'serve';
+    var serverDir = server + '/';
+
 
     var bower = {
         json: require(projectDir + 'bower.json'),
@@ -15,54 +26,57 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         ignorePath: '../..'
     };
 
-    var typings = tools + 'typings';
-    var offlineXMLDir = tmp + 'offlineXML';
+    var typings = toolsDir + 'typings';
+    var offlineXMLDir = tmpDir + 'offlineXML';
 
     var config = {
+        app: app,
+        appDir: appDir,
         appTypeScriptReferences: typings + '/app.d.ts',
         bower: bower,
         bowerJson: projectDir + 'bower.json',
         build: buildDir,
         client: app,
-        distjs: [ tmp + templateCache],
+        distjs: [tmpDir + templateCache],
         docs: projectDir + "docs/",
         gulpFolder: apToolsDir + 'gulp',
-        index: app + "index.html",
-        lessOutput: app + 'styles/css',
+        index: appDir + "index.html",
+        lessOutput: appDir + 'styles/css',
         offlineXMLConstant: 'apCachedXML',
         offlineXMLName: 'offlineXML.js',
         offlineXMLDir: offlineXMLDir,
-        offlineXMLSrc: [ projectDir + 'xml-cache/', bower.directory + 'angular-point/test/mock/xml/'],
+        offlineXMLSrc: [projectDir + 'xml-cache/', bower.directory + 'angular-point/test/mock/xml/'],
         packageJson: projectDir + 'package.json',
-        projectless: app + "styles/less/*.less",
+        projectless: appDir + "styles/less/*.less",
         report: projectDir + "report/",
+        server: server,
+        serverDir: serverDir,
         templateCache: templateCache,
+        templatesModule: 'templateCache',
         tmp: tmp,
+        tmpDir: tmpDir,
         tsdJson: projectDir + 'tsd.json',
-        tsFiles: [app + '**/*.ts', './node_modules/angular-point-tools/angular-point-ts/**/*.ts'],
-        tsOutput: tsOutput,
-        tsOutputName: 'sortOutput.json',
+        tsFiles: [app + '/**/*.ts', './node_modules/angular-point*/ts/**/*.ts'],
+        tsSortOutputName: 'sortOutput.json',
         typings: typings,
-
-        htmltemplates: [
-            app + "**/*.html",
-            "!" + app + "index.html"
-        ],
+        userefSearchPaths: ['.', app, server],
+        //Want everything besides index.html, so ignore the root appDir directory
+        htmltemplates: appDir + "*/**/*.html",
         projectcss: [
-            app + "styles/**/*.css",
-            bower.directory + "angular-point-discussion-thread/dist/apDiscussionThread.css",
-            "!" + app + "styles/**/bootstrap.css",
-            "!" + app + "styles/**/bower.css"
+            appDir + "styles/**/*.css",
+            bower.directory + "angular-point-discussion-thread/dist/apDiscussionThread.css"
+        /** Issue Globbing, doesn't currently work */
+            //"!(bootstrap.css)"
         ],
         projectjs: [
-            app + "**/*.module.js",
-            app + "**/*.js",
-            "!" + app + "**/*.spec.js",
-            "!" + app + "**/*.mock.js"
+            appDir + "**/*.module.js",
+            appDir + "**/*.js",
+            appDir + "**/!*(.speck.js)",
+            appDir + "**/!*(.mock.js)"
         ],
         specs: [
             test + "**/*.spec.js",
-            app + "**/*.spec.js"
+            appDir + "**/*.spec.js"
         ],
         fonts: [
             bower.directory + "font-awesome/fonts/*",
@@ -70,7 +84,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
             bower.directory + "angular-ui-grid/*.{eot,svg,ttf,woff}"
         ],
         images: [
-            app + "images/**/*.*"
+            appDir + "images/**/*.*"
         ],
         offlinexml: [
             projectDir + "xml-cache/**/*.xml",
@@ -111,9 +125,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
             bower.directory + "angular-ui-select/dist/select.css",
             bower.directory + "angular-toastr/dist/angular-toastr.css",
             bower.directory + "angular-loading-bar/build/loading-bar.css",
-            bower.directory + "font-awesome/css/font-awesome.min.css",
-            app + "styles/**/*bootstrap.css",
-            app + "styles/**/*bower.css"
+            bower.directory + "font-awesome/css/font-awesome.min.css"
         ]
 
     };

@@ -15,6 +15,7 @@ module.exports = function(projectDir, paths) {
             .use(serveStatic('app'))
             // config to bower_components should be relative to the current file
             // e.g. in app/index.html you should use ../bower_components
+            .use('/app', serveStatic('app'))
             .use('/bower_components', serveStatic('bower_components'))
             .use('/node_modules', serveStatic('node_modules'))
             .use('/xml-cache', serveStatic('xml-cache'))
