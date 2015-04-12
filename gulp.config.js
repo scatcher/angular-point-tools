@@ -56,7 +56,11 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         tmp: tmp,
         tmpDir: tmpDir,
         tsdJson: projectDir + 'tsd.json',
-        tsFiles: [app + '/**/*.ts', './node_modules/angular-point*/ts/**/*.ts'],
+        tsFiles: [
+            app + '/**/*.ts',
+            './node_modules/angular-point*/ts/**/*.ts',
+            bower.directory + 'angular-point*/ts/**/*.ts'
+        ],
         tsSortOutputName: 'sortOutput.json',
         typings: typings,
         userefSearchPaths: ['.', app, server],
