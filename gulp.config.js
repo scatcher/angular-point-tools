@@ -15,6 +15,8 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
 
 
     var buildDir = projectDir + "dist/";
+    var nodeModules = projectConfig.nodeModules || projectDir + 'node_modules/';
+
     var templateCache = 'templateCache.js';
     var server = tmpDir + 'serve';
     var serverDir = server + '/';
@@ -42,6 +44,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         gulpFolder: apToolsDir + 'gulp',
         index: appDir + "index.html",
         lessOutput: appDir + 'styles/css',
+        nodeModules: nodeModules,
         offlineXMLConstant: 'apCachedXML',
         offlineXMLName: 'offlineXML.js',
         offlineXMLDir: offlineXMLDir,
@@ -58,7 +61,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         tsdJson: projectDir + 'tsd.json',
         tsFiles: [
             app + '/**/*.ts',
-            './node_modules/angular-point*/ts/**/*.ts',
+            nodeModules + 'angular-point*/ts/**/*.ts',
             bower.directory + 'angular-point*/ts/**/*.ts'
         ],
         tsSortOutputName: 'sortOutput.json',
