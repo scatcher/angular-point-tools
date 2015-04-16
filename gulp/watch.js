@@ -47,7 +47,9 @@ module.exports = function(projectDir, paths) {
 
         gulp.watch(paths.projectless, ['styles']);
 
-        gulp.watch(paths.tsFiles, ['ts'])
+        gulp.watch(paths.tsFiles, ['ts']);
+
+        gulp.watch(paths.serverDir + '**/*.js')
             .on('change', $.livereload.changed);
 
     });
