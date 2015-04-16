@@ -13,10 +13,6 @@ Build tools shared by angular-point projects.
 ## Start Server and Watch For Changes
         gulp serve
         
-## Pulling Down TypeScript Definitions
-        //Installs TS definitions for packages in bower.json
-        gulp tsd
-
 ## Minimum Config
 Setting up your gulpfile.js
                 
@@ -26,16 +22,16 @@ Setting up your gulpfile.js
         require('angular-point-tools')(projectDir, config);
         
 ## Setting up Aggregate Typings File
-        /// <reference path="../../.tmp/typings/tsd.d.ts" />
-        /// <reference path="../../node_modules/angular-point-tools/interfaces/angular-point.d.ts" />
-        /// <reference path="../../node_modules/angular-point-tools/angular-point-ts/Model.ts" />
-        /// <reference path="../../node_modules/angular-point-tools/angular-point-ts/ListItem.ts" />
+        /// <reference path="tsd.d.ts" />
+        /// <reference path="../node_modules/angular-point-tools/interfaces/angular-point.d.ts" />
+        /// <reference path="../node_modules/angular-point-tools/ts/Model.ts" />
+        /// <reference path="../node_modules/angular-point-tools/ts/ListItem.ts" />
 
 ## Referencing Project Types From the Application
 From a given TS file add reference
         
         
-        /// <reference path="../../../tools/typings/app.d.ts" />
+        /// <reference path="../../../typings/app.d.ts" />
         
 ## Add an Injection Point in your index.html
         <!-- inject-ts:js -->
@@ -134,12 +130,15 @@ probably want to have in something like below:
                 offline = true;
                 /** Add in mock library if working offline to prevent us from making outside requests */
                 modules.push('ngMockE2E');
-            }
+            } else {
+                 /** Reference the module used by template cache */
+                 modules.push('templateCache');
+             }
         
-            angular.module('pmam-deliverables', modules);
+            angular.module('my-app-module', modules);
         
             if(offline) {
-                angular.module('pmam-deliverables')
+                angular.module('my-app-module')
                 /** Set a default user in offline */
                     .constant('mockUser', {
                         lookupId: 441,
@@ -157,3 +156,7 @@ probably want to have in something like below:
         
             }
         }
+        
+## Pulling Down TypeScript Definitions
+        //Installs TS definitions for packages in bower.json
+        gulp tsd
