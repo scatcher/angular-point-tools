@@ -47,9 +47,10 @@ module.exports = function (projectDir, paths) {
 
             .pipe(jsFilter)
             //.pipe($.ngAnnotate({add: true, single_quotes: true}))
-            //.pipe($.stripDebug())
             //.pipe($.bytediff.start())
+            //.pipe($.sourcemaps.init())
             //.pipe($.uglify({mangle: true}))
+            //.pipe($.sourcemaps.write())
             //.pipe($.bytediff.stop(bytediffFormatter))
             .pipe(jsFilter.restore())
 
