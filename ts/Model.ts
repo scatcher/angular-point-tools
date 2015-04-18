@@ -177,14 +177,15 @@ module ap {
      */
 
     interface QueriesContainer{
-        [queryKey:string]:ap.IQuery
+        getAllListItems?:IQuery;
+        [key:string]:IQuery
     }
 
-    export class Model implements ap.Model {
+    export class Model implements ap.IModel {
         data = [];
         deferredListDefinition;
         list:ap.IList;
-        factory:ObjectConstructor = ListItemFactory.createGenericFactory();
+        factory<T>(obj):T;
         fieldDefinitionsExtended:boolean = false;
         /** Date/Time of last communication with server */
         lastServerUpdate:Date;
@@ -276,7 +277,7 @@ module ap {
          * </file>
          * </pre>
          */
-        addNewItem(entity:ListItem, options?:Object): ng.IPromise<ListItem> {
+        addNewItem(entity:Object, options?:Object): ng.IPromise<ListItem> {
             var model = this,
                 deferred = $q.defer();
 

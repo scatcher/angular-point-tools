@@ -39,8 +39,8 @@ declare module ap {
         List?
     }
 
-    export interface IListItemVersion {
-        //TODO Implement
+    export interface IListItemVersion extends IListItem {
+        version:Date;
     }
 
     export interface IWorkflowDefinition {
@@ -113,10 +113,11 @@ declare module ap {
     }
 
     export interface IModel {
-        factory(obj:Object): void;
+        factory<T>(obj:Object):T;
         list:IList;
 
-        addNewItem(entity:IListItem, options?:Object): ng.IPromise<IListItem>;
+
+        addNewItem(entity:Object, options?:Object): ng.IPromise<IListItem>;
         createEmptyItem(overrides?:Object): IListItem;
         executeQuery(queryName?:string, options?:Object): ng.IPromise<IIndexedCache>;
         extendListMetadata(options:Object): ng.IPromise<any>;
@@ -132,6 +133,7 @@ declare module ap {
         getModel():IModel;
         getQuery(queryName:string): IQuery;
         isInitialised(): boolean;
+        queries:{getAllListItems:IQuery; [key:string]:IQuery};
         registerQuery(queryOptions: IQueryOptions): IQuery;
         resolvePermissions(): IUserPermissionsObject;
         validateEntity(entity:IListItem, options?:Object): boolean;
@@ -211,6 +213,16 @@ declare module ap {
         EditMyUserInfo:boolean;
         EnumeratePermissions:boolean;
         FullMask:boolean;
+    }
+
+    export interface IAPConfig{
+        appTitle:string;
+        debug:boolean;
+        defaultQueryName:string;
+        defaultUrl:string;
+        environment?:string;
+        firebaseURL?:string;
+        offline:boolean;
     }
 
 }

@@ -255,12 +255,13 @@ module ap {
          * </pre>
          * @returns {object} The listItem the lookup is referencing or undefined if not in the cache.
          */
-        getLookupReference( fieldName:string, lookupId:number ): ListItem {
+        getLookupReference( fieldName:string, lookupId:number ): ListItem | '' {
             var listItem = this;
+            var lookupReference;
             if (_.isUndefined(fieldName)) {
                 throw new Error('A field name is required.');
             } else if (_.isEmpty(listItem[fieldName])) {
-                return '';
+                lookupReference = '';
             } else {
                 var model = listItem.getModel();
                 var fieldDefinition = model.getFieldDefinition(fieldName);
@@ -268,12 +269,13 @@ module ap {
                  *  that a lookup is referencing. */
                 if (fieldDefinition && fieldDefinition.List) {
                     var targetId = lookupId || listItem[fieldName].lookupId;
-                    return apCacheService.getCachedEntity(fieldDefinition.List, targetId);
+                    lookupReference = apCacheService.getCachedEntity(fieldDefinition.List, targetId);
                 } else {
                     throw new Error('This isn\'t a valid Lookup field or the field definitions need to be extended ' +
-                    'before we can complete this request.');
+                        'before we can complete this request.');
                 }
             }
+            return lookupReference;
         }
 
         /**
@@ -640,7 +642,8 @@ module ap {
                     operation: 'GetVersionCollection',
                     strlistID: model.list.getListId(),
                     strlistItemID: listItem.id,
-                    strFieldName: fieldDefinition.staticName
+                    strFieldName: fieldDefinition.staticName,
+                    webURL:undefined
                 };
 
                 /** Manually set site url if defined, prevents SPServices from making a blocking call to fetch it. */
