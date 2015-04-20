@@ -255,7 +255,7 @@ module ap {
          * </pre>
          * @returns {object} The listItem the lookup is referencing or undefined if not in the cache.
          */
-        getLookupReference( fieldName:string, lookupId:number ): ListItem | '' {
+        getLookupReference( fieldName:string, lookupId?:number ): ListItem{
             var listItem = this;
             var lookupReference;
             if (_.isUndefined(fieldName)) {
