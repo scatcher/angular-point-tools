@@ -120,7 +120,7 @@ declare module ap {
         addNewItem(entity:Object, options?:Object): ng.IPromise<IListItem>;
         createEmptyItem(overrides?:Object): IListItem;
         executeQuery(queryName?:string, options?:Object): ng.IPromise<IIndexedCache>;
-        extendListMetadata(options:Object): ng.IPromise<any>;
+        extendListMetadata(options?:Object): ng.IPromise<any>;
         generateMockData(options?:Object): IListItem[];
         getAllListItems(): ng.IPromise<IIndexedCache>;
         getCache(queryName:string): ICache;
