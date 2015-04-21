@@ -277,7 +277,7 @@ module ap {
          * </file>
          * </pre>
          */
-        addNewItem(entity:Object, options?:Object): ng.IPromise<ListItem> {
+        addNewItem<T>(entity:Object, options?:Object): ng.IPromise<T> {
             var model = this,
                 deferred = $q.defer();
 
@@ -303,7 +303,7 @@ module ap {
          * @param {object} [overrides] - Optionally extend the new empty item with specific values.
          * @returns {object} Newly created list item.
          */
-        createEmptyItem(overrides?:Object): ListItem {
+        createEmptyItem<T>(overrides?:Object): T {
             var model = this;
             var newItem = {};
             _.each(model.list.customFields, function (fieldDefinition) {
@@ -392,7 +392,7 @@ module ap {
          * @param {boolean} [options.staticValue=false] By default all mock data is dynamically created but if set,
          * this will cause static data to be used instead.
          */
-        generateMockData(options?:Object): ListItem[] {
+        generateMockData<T>(options?:Object): T[] {
             var mockData = [],
                 model = this;
 
@@ -484,7 +484,7 @@ module ap {
          * @param {number} entityId The ID of the requested entity.
          * @returns {object} Returns either the requested entity or undefined if it's not found.
          */
-        getCachedEntity(entityId:number): ap.IListItem {
+        getCachedEntity<T>(entityId:number): T {
             var model = this;
             return apCacheService.getCachedEntity(model.list.getListId(), entityId);
         }
@@ -546,7 +546,7 @@ module ap {
              * };
          * </pre>
          */
-        getListItemById(entityId:number, options?:Object): ng.IPromise<ListItem> {
+        getListItemById<T>(entityId:number, options?:Object): ng.IPromise<T> {
             var deferred = $q.defer(),
                 model = this,
                 /** Unique Query Name */
