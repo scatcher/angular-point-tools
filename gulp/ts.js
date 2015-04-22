@@ -17,8 +17,8 @@ module.exports = function(projectDir, paths) {
     gulp.task('ts', function() {
         return gulp.src(paths.tsFiles)
             .pipe(sourcemaps.init())
-            .pipe(tslint())
-            .pipe(tslint.report('prose', { emitError: false }))
+            //.pipe(tslint())
+            //.pipe(tslint.report('prose', { emitError: false }))
             .pipe(typescript({sortOutput: true, declarationFiles:true}))
             .pipe(sourcemaps.write())
             .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative:true}))

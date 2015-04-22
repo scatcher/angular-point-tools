@@ -120,7 +120,7 @@ module ap {
             }
 
             apDataService.updateListItem(model, listItem, options)
-                .then(function (updatedListItem) {
+                .then( (updatedListItem) => {
                     deferred.resolve(updatedListItem);
                     /** Optionally broadcast change event */
                     apUtilityService.registerChange(model, 'update', updatedListItem.id);
@@ -169,7 +169,7 @@ module ap {
             /** Allow a string to be passed in to save a single field */
             var fieldNames = _.isString(fieldArray) ? [fieldArray] : fieldArray;
             /** Find the field definition for each of the requested fields */
-            _.each(fieldNames, function (field) {
+            _.each(fieldNames, (field) => {
                 var match = _.find(model.list.customFields, {mappedName: field});
                 if (match) {
                     definitions.push(match);
@@ -185,7 +185,7 @@ module ap {
             var opts = _.extend({}, defaults, options);
 
             apDataService.updateListItem(model, listItem, opts)
-                .then(function (updatedListItem) {
+                .then( (updatedListItem) => {
                     deferred.resolve(updatedListItem);
                     /** Optionally broadcast change event */
                     apUtilityService.registerChange(model, 'update', updatedListItem.id);
@@ -221,7 +221,7 @@ module ap {
             var model = listItem.getModel();
             var deferred = $q.defer();
 
-            apDataService.deleteListItem(model, listItem, options).then(function (response) {
+            apDataService.deleteListItem(model, listItem, options).then( (response) => {
                 deferred.resolve(response);
                 /** Optionally broadcast change event */
                 apUtilityService.registerChange(model, 'delete', listItem.id);
@@ -463,7 +463,7 @@ module ap {
             } else {
                 /** We first need to get the template GUID for the workflow */
                 listItem.getAvailableWorkflows()
-                    .then(function (workflows) {
+                    .then( (workflows) => {
                         var targetWorklow = _.findWhere(workflows, {name: options.workflowName});
                         if (!targetWorklow) {
                             throw 'A workflow with the specified name wasn\'t found.';
@@ -478,9 +478,9 @@ module ap {
 
             function initiateRequest() {
                 apDataService.startWorkflow(options)
-                    .then(function (xmlResponse) {
+                    .then( (xmlResponse) => {
                         deferred.resolve(xmlResponse);
-                    })
+                    });
             }
         }
 
@@ -634,7 +634,7 @@ module ap {
             var model = listItem.getModel();
 
             /** Constructor that creates a promise for each field */
-            var createPromise = function (fieldName) {
+            var createPromise = (fieldName) => {
 
                 var fieldDefinition = _.find(model.list.fields, {mappedName: fieldName});
 
@@ -658,7 +658,7 @@ module ap {
                 /** If fields aren't provided, pull the version history for all NON-readonly fields */
                 var targetFields = _.where(model.list.fields, {readOnly: false});
                 fieldNames = [];
-                _.each(targetFields, function (field) {
+                _.each(targetFields, (field) => {
                     fieldNames.push(field.mappedName);
                 });
             } else if (_.isString(fieldNames)) {
@@ -667,18 +667,18 @@ module ap {
             }
 
             /** Generate promises for each field */
-            _.each(fieldNames, function (fieldName) {
+            _.each(fieldNames, (fieldName) => {
                 createPromise(fieldName);
             });
 
             /** Pause until all requests are resolved */
-            $q.all(promiseArray).then(function (changes) {
+            $q.all(promiseArray).then( (changes) => {
                 var versionHistory = {};
 
                 /** All fields should have the same number of versions */
-                _.each(changes, function (fieldVersions) {
+                _.each(changes, (fieldVersions) => {
 
-                    _.each(fieldVersions, function (fieldVersion) {
+                    _.each(fieldVersions, (fieldVersion) => {
                         versionHistory[fieldVersion.modified.toJSON()] =
                             versionHistory[fieldVersion.modified.toJSON()] || {};
 
@@ -689,7 +689,7 @@ module ap {
 
                 var versionArray = [];
                 /** Add a version prop on each version to identify the numeric sequence */
-                _.each(versionHistory, function (ver, num) {
+                _.each(versionHistory, (ver, num) => {
                     ver.version = num;
                     versionArray.push(ver);
                 });

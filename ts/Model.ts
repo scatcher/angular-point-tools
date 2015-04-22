@@ -200,9 +200,7 @@ module ap {
             model.list = apListFactory.create(model.list);
 
             /** Create a reference to the parent model on the factory prototype for the given model */
-            model.factory.prototype.getModel = function () {
-                return model;
-            };
+            model.factory.prototype.getModel = () => model;
 
             /** Register cache name with cache service so we can map factory name with list GUID */
             apCacheService.registerModel(model);
@@ -282,7 +280,7 @@ module ap {
                 deferred = $q.defer();
 
             apDataService.createListItem(model, entity, options)
-                .then(function (listItem) {
+                .then( (listItem) => {
                     deferred.resolve(listItem);
                     /** Optionally broadcast change event */
                     apUtilityService.registerChange(model, 'create', listItem.id);
@@ -306,7 +304,7 @@ module ap {
         createEmptyItem<T>(overrides?:Object): T {
             var model = this;
             var newItem = {};
-            _.each(model.list.customFields, function (fieldDefinition) {
+            _.each(model.list.customFields, (fieldDefinition) => {
                 /** Create attributes for each non-readonly field definition */
                 if (!fieldDefinition.readOnly) {
                     /** Create an attribute with the expected empty value based on field definition type */
@@ -370,7 +368,7 @@ module ap {
 
                 var opts = _.extend({}, defaults, options);
                 apDataService.getList(opts)
-                    .then(function (responseXML) {
+                    .then( (responseXML) => {
                         apDecodeService.extendListMetadata(model, responseXML);
                         deferred.resolve(model);
                     });
@@ -405,12 +403,12 @@ module ap {
             /** Extend defaults with any provided options */
             var opts = _.extend({}, defaults, options);
 
-            _.times(opts.quantity, function (count) {
+            _.times(opts.quantity,  (count) => {
                 var mock = {
                     id: count + 1
                 };
                 /** Create an attribute with mock data for each field */
-                _.each(model.list.fields, function (field:ap.IFieldDefinition) {
+                _.each(model.list.fields, (field:ap.IFieldDefinition) => {
                     mock[field.mappedName] = field.getMockData(opts);
                 });
 
@@ -574,10 +572,10 @@ module ap {
             }
 
             model.executeQuery(queryKey)
-                .then(function (indexedCache) {
+                .then( (indexedCache) => {
                     /** Should return an indexed cache object with a single entity so just return the requested entity */
                     deferred.resolve(indexedCache.first());
-                }, function (err) {
+                }, (err) => {
                     deferred.reject(err);
                 });
 
@@ -960,11 +958,11 @@ module ap {
             /** Extend defaults with any provided options */
             var opts = _.extend({}, defaults, options);
 
-            var checkObject = function (fieldValue) {
+            var checkObject = (fieldValue) => {
                 return _.isObject(fieldValue) && _.isNumber(fieldValue.lookupId);
             };
 
-            _.each(model.list.customFields, function (fieldDefinition:ap.IFieldDefinition) {
+            _.each(model.list.customFields, (fieldDefinition:ap.IFieldDefinition) => {
                 var fieldValue = entity[fieldDefinition.mappedName];
                 var fieldDescriptor = '"' + fieldDefinition.objectType + '" value.';
                 /** Only evaluate required fields */
@@ -986,7 +984,7 @@ module ap {
                             valid = _.isArray(fieldValue) && fieldValue.length > 0;
                             if (valid) {
                                 /** Additionally check that each lookup/person contains a lookupId */
-                                _.each(fieldValue, function (fieldObject) {
+                                _.each(fieldValue, (fieldObject) => {
                                     if (valid) {
                                         valid = checkObject(fieldObject);
                                     } else {
