@@ -1,6 +1,6 @@
 {
   "name": "angular-point-tools",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Build tools shared by angular-point projects.",
   "main": "gulpfile.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "url": "https://github.com/scatcher/angular-point-tools.git"
   },
   "dependencies": {
-    "concat-string":"^1.4.8",
+    "concat-stream":"^1.4.8",
     "connect": "^3.3.5",
     "connect-livereload": "^0.5.3",
     "del": "^1.1.1",
@@ -57,6 +57,7 @@
     "lodash": "^3.7.0",
     "main-bower-files": "^2.6.2",
     "opn": "^1.0.1",
+    "readable-stream": "^1.0.33",
     "serve-index": "^1.6.3",
     "serve-static": "^1.9.2",
     "tsd": "~0.6.0-beta.5",
