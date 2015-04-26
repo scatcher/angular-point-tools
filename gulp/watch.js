@@ -31,11 +31,11 @@ module.exports = function(projectDir, paths) {
             });
     });
 
-    gulp.task('server', ['connect', 'inject-dev'], function () {
+    gulp.task('server', ['connect', 'inject-dev', 'styles'], function () {
         require('opn')('http://localhost:9000');
     });
 
-    gulp.task('watch', ['connect', 'server'], function () {
+    gulp.task('watch', ['connect', 'server', 'watch-ts'], function () {
         $.livereload.listen();
 
         // watch for changes
@@ -47,13 +47,14 @@ module.exports = function(projectDir, paths) {
 
         gulp.watch(paths.projectless, ['styles']);
 
-        gulp.watch(paths.tsFiles, ['ts']);
-
         gulp.watch(paths.serverDir + '**/*.js')
             .on('change', $.livereload.changed);
 
     });
 
+    gulp.task('watch-ts', ['ts'], function () {
+        gulp.watch(paths.tsFiles, ['ts']);
+    });
 
     gulp.task('serve', ['watch']);
 

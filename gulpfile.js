@@ -1,13 +1,22 @@
 'use strict';
 
 var log = require('gulp-util').log;
+var gulp = require('gulp');
+var wrench = require('wrench');
+var _ = require('lodash');
+var typescript = require('gulp-typescript');
+
+gulp.task('dts', function () {
+    var ts = gulp.src('./ts/*.ts')
+        .pipe(typescript({declarationFiles: true}));
+
+    return ts.dts.pipe(gulp.dest('./interfaces'));
+});
 
 module.exports = function (projectDir, projectConfig) {
 
+
     /* jshint camelcase:false */
-    var gulp = require('gulp');
-    var wrench = require('wrench');
-    var _ = require('lodash');
 
     var apToolsDir = __dirname + '/';
 
@@ -23,6 +32,8 @@ module.exports = function (projectDir, projectConfig) {
     }).map(function (file) {
         require(defaultConfig.gulpFolder + '/' + file)(projectDir, paths);
     });
+
+
 
 
 ////////////////

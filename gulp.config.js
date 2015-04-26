@@ -4,15 +4,14 @@ var _ = require('lodash');
 
 module.exports = function (apToolsDir, projectDir, projectConfig) {
     var appFolderName = 'app';
-    var app = projectConfig.appDir || projectDir + appFolderName,
+    var app = projectConfig.app || projectDir + appFolderName,
         appDir = app + '/',
         test = projectConfig.test || projectDir + 'test',
         testDir = test + '/',
         tmp = projectConfig.tmp || projectDir + '.tmp',
         tmpDir = tmp + '/',
-        tools = projectConfig.tools || projectDir + 'tools',
-        toolsDir = tmp + '/';
-
+        typings = projectConfig.typings || projectDir + 'typings',
+        typingsDir = typings + '/';
 
     var buildDir = projectDir + "dist/";
     var nodeModules = projectConfig.nodeModules || projectDir + 'node_modules/';
@@ -21,15 +20,13 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
     var server = tmpDir + 'serve';
     var serverDir = server + '/';
 
-
     var bower = {
         json: require(projectDir + 'bower.json'),
         directory: projectDir + 'bower_components/',
         ignorePath: '../..'
     };
 
-    var typings = toolsDir + 'typings';
-    var offlineXMLDir = tmpDir + 'offlineXML';
+    var offlineXML = tmpDir + 'offlineXML';
 
     var config = {
         app: app,
@@ -41,14 +38,15 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         client: app,
         distjs: [tmpDir + templateCache],
         docs: projectDir + "docs/",
-        gulpFolder: apToolsDir + 'gulp',
+        gulpFolder: apToolsDir + '/gulp',
         index: appDir + "index.html",
         lessOutput: appDir + 'styles/css',
         nodeModules: nodeModules,
         offlineXMLConstant: 'apCachedXML',
         offlineXMLName: 'offlineXML.js',
-        offlineXMLDir: offlineXMLDir,
-        offlineXMLSrc: [projectDir + 'xml-cache/', bower.directory + 'angular-point/test/mock/xml/'],
+        offlineXML: offlineXML,
+        offlineXMLDir: offlineXML + '/',
+        offlineXMLSrc: [projectDir + 'xml-cache/', bower.directory + 'angular-point/xml-cache/'],
         packageJson: projectDir + 'package.json',
         projectless: appDir + "styles/less/*.less",
         report: projectDir + "report/",
@@ -61,11 +59,12 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         tsdJson: projectDir + 'tsd.json',
         tsFiles: [
             app + '/**/*.ts',
-            nodeModules + 'angular-point*/ts/**/*.ts',
+            //nodeModules + 'angular-point*/ts/**/*.ts',
             bower.directory + 'angular-point*/ts/**/*.ts'
         ],
         tsSortOutputName: 'sortOutput.json',
         typings: typings,
+        typingsDir: typingsDir,
         userefSearchPaths: ['.', app, server],
         //Want everything besides index.html, so ignore the root appDir directory
         htmltemplates: appDir + "*/**/*.html",
@@ -96,7 +95,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         ],
         offlinexml: [
             projectDir + "xml-cache/**/*.xml",
-            bower.directory + "angular-point/test/mock/xml/**/*.xml"
+            bower.directory + "angular-point/xml-cache/**/*.xml"
         ],
         cdnjs: [
             bower.directory + "jquery/dist/jquery.js",
@@ -109,9 +108,9 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         ],
         devjs: [
             bower.directory + "chance/chance.js",
-            offlineXMLDir + '/*.js',
+            offlineXML + '/*.js',
             bower.directory + "angular-mocks/angular-mocks.js",
-            bower.directory + "angular-point/test/mock/apMockBackend.js"
+            bower.directory + "angular-point/test/mock/apMockBackend.mock.js"
         ],
         modules: [
             bower.directory + "angular-point/dist/angular-point.js"

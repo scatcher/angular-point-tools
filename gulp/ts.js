@@ -98,16 +98,19 @@ module.exports = function(projectDir, paths) {
      * Generates the app.d.ts references file dynamically from all application *.ts files.
      * TODO This currently breaks order so don't use
      */
-    //gulp.task('gen-ts-refs', ['ts'], function () {
-    //    var target = gulp.src(config.appTypeScriptReferences);
-    //    var sources = gulp.src(config.tsFiles, {read: false});
-    //    return target.pipe($.inject(sources, {
-    //        starttag: '//{',
-    //        endtag: '//}',
-    //        transform: function (filepath) {
-    //            return '/// <reference path="../..' + filepath + '" />';
-    //        }
-    //    })).pipe(gulp.dest(config.typings));
-    //});
 
+    /**
+     * Generates the app.d.ts references file dynamically from all application *.ts files.
+     */
+    gulp.task('gen-ts-refs', function () {
+        var target = gulp.src(paths.appTypeScriptReferences);
+        var sources = gulp.src([paths.tsFiles], {read: false});
+        return target.pipe($.inject(sources, {
+            starttag: '//{',
+            endtag: '//}',
+            transform: function (filepath) {
+                return '/// <reference path="..' + filepath + '" />';
+            }
+        })).pipe(gulp.dest(paths.typings));
+    });
 };

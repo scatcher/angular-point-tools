@@ -1,4 +1,5 @@
 /// <reference path="Model.ts" />
+/// <reference path="../typings/tsd.d.ts" />
 
 module ap {
     'use strict';
@@ -20,22 +21,20 @@ module ap {
      */
 
     class ListItemFactory {
-        constructor(_$q_, _toastr_, _apCacheService_, _apDataService_, _apEncodeService_, _apUtilityService_,
-                    _apFormattedFieldValueService_, _apConfig_) {
-
-            $q = _$q_;
-            apCacheService = _apCacheService_;
-            apConfig = _apConfig_;
-            apDataService = _apDataService_;
-            apEncodeService = _apEncodeService_;
-            apFormattedFieldValueService = _apFormattedFieldValueService_;
-            apUtilityService = _apUtilityService_;
-            toastr = _toastr_;
+        constructor($injector) {
+            $q = $injector.get("$q");
+            apCacheService = $injector.get("apCacheService");
+            apConfig = $injector.get("apConfig");
+            apDataService = $injector.get("DataService");
+            apEncodeService = $injector.get("apEncodeService");
+            apFormattedFieldValueService = $injector.get("apFormattedFieldValueService");
+            apUtilityService = $injector.get("apUtilityService");
+            toastr = $injector.get("toastr");
         }
 
         /**
          * @ngdoc function
-         * @name apListItemFactory:create
+         * @name apListItemFactory: create
          * @methodOf apListItemFactory
          * @description
          * Instantiates and returns a new ListItem.
@@ -46,7 +45,7 @@ module ap {
 
         /**
          * @ngdoc function
-         * @name apListItemFactory:createGenericFactory
+         * @name apListItemFactory: createGenericFactory
          * @methodOf apListItemFactory
          * @description
          * In the event that a factory isn't specified, just use a
@@ -55,9 +54,46 @@ module ap {
         createGenericFactory() {
             return new StandardListItem();
         }
-        public ListItem:ListItem;
+        public ListItem: ListItem;
 
     }
+
+    export interface IListItem {
+        author?: IUser;
+        created?: Date;
+        editor?: IUser;
+        fileRef?: ILookup;
+        id?: number;
+        modified?: Date;
+        permMask?: string;
+        uniqueId?: string;
+
+        deleteAttachment(url: string): ng.IPromise<any>;
+        deleteItem(options?: IListItemCrudOptions): ng.IPromise<any>;
+        getAttachmentCollection(): ng.IPromise<string[]>;
+        getAvailableWorkflows(): ng.IPromise<IWorkflowDefinition[]>;
+        getCache?(): ICache;
+        getFieldChoices(fieldName: string): string[];
+        getFieldDefinition(fieldName: string): IFieldDefinition;
+        getFieldDescription(fieldName: string): string;
+        getFieldLabel(fieldName: string): string;
+        getFieldVersionHistory(fieldNames: string[]): ng.IPromise<IListItemVersion>;
+        getFormattedValue(fieldName: string, options: Object): string;
+        getLookupReference(fieldName: string, lookupId: number): IListItem;
+        getQuery?():IQuery;
+        resolvePermissions(): IUserPermissionsObject;
+        saveChanges(options?: IListItemCrudOptions): ng.IPromise<IListItem>;
+        saveFields(fieldArray: string[], options?: IListItemCrudOptions): ng.IPromise<IListItem>;
+        startWorkflow(options: IStartWorkflowParams): ng.IPromise<any>;
+        validateEntity(options?: Object): boolean;
+
+        //Added by Model Instantiation
+        getModel(): IModel;
+        getListId(): string;
+        getList?(): IList;
+
+    }
+
 
     /**
      * @ngdoc object
@@ -68,15 +104,17 @@ module ap {
      * @constructor
      */
     export class ListItem implements ap.IListItem {
-        author:ap.IUser;
-        created:Date;
-        editor:ap.IUser;
-        fileRef:ap.ILookup;
-        getModel():ap.IModel;
-        id:number;
-        modified:Date;
-        permMask:string;
-        uniqueId:string;
+        author: ap.IUser;
+        created: Date;
+        editor: ap.IUser;
+        fileRef: ap.ILookup;
+        getCache:Function;
+        getModel(): ap.IModel;
+        getQuery():IQuery;
+        id: number;
+        modified: Date;
+        permMask: string;
+        uniqueId: string;
         constructor() {
         }
 
@@ -107,7 +145,7 @@ module ap {
          * }
          * </pre>
          */
-        saveChanges( options?:ap.IListItemCrudOptions ): ng.IPromise<ListItem> {
+        saveChanges( options?: ap.IListItemCrudOptions ): ng.IPromise<ListItem> {
             var listItem = this;
             var model = listItem.getModel();
             var deferred = $q.defer();
@@ -160,7 +198,7 @@ module ap {
          * }
          * </pre>
          */
-        saveFields( fieldArray:string[], options?:ap.IListItemCrudOptions ): ng.IPromise<ListItem> {
+        saveFields( fieldArray: string[], options?: ap.IListItemCrudOptions ): ng.IPromise<ListItem> {
 
             var listItem = this;
             var model = listItem.getModel();
@@ -216,7 +254,7 @@ module ap {
          * List of tasks.  When the delete link is clicked, the list item item is removed from the local cache and
          * the view is updated to no longer show the task.
          */
-        deleteItem( options?:ap.IListItemCrudOptions ): ng.IPromise<any> {
+        deleteItem( options?: ap.IListItemCrudOptions ): ng.IPromise<any> {
             var listItem = this;
             var model = listItem.getModel();
             var deferred = $q.defer();
@@ -255,7 +293,7 @@ module ap {
          * </pre>
          * @returns {object} The listItem the lookup is referencing or undefined if not in the cache.
          */
-        getLookupReference( fieldName:string, lookupId?:number ): ListItem{
+        getLookupReference( fieldName: string, lookupId?: number ): ListItem{
             var listItem = this;
             var lookupReference;
             if (_.isUndefined(fieldName)) {
@@ -289,7 +327,7 @@ module ap {
          * @param {object} [options] Pass through to apFormattedFieldValueService.getFormattedFieldValue.
          * @returns {string} Formatted string representing the field value.
          */
-        getFormattedValue( fieldName:string, options?:Object ): string {
+        getFormattedValue( fieldName: string, options?: Object ): string {
             var listItem = this;
             var fieldDefinition = listItem.getFieldDefinition(fieldName);
             if (!fieldDefinition) {
@@ -309,7 +347,7 @@ module ap {
          * @param {boolean} [options.toast=true] Set to false to prevent toastr messages from being displayed.
          * @returns {boolean} Evaluation of validity.
          */
-        validateEntity( options?:Object ): boolean {
+        validateEntity( options?: Object ): boolean {
             var listItem = this,
                 model = listItem.getModel();
             return model.validateEntity(listItem, options);
@@ -337,7 +375,7 @@ module ap {
          * @param {string} fieldName Internal field name.
          * @returns {object} Field definition.
          */
-        getFieldDefinition( fieldName:string ): ap.IFieldDefinition {
+        getFieldDefinition( fieldName: string ): ap.IFieldDefinition {
             var listItem = this;
             return listItem.getModel().getFieldDefinition(fieldName);
         }
@@ -355,7 +393,7 @@ module ap {
          * caml case version of the mapped name using apUtilityService.fromCamelCase.
          * @returns {string} The label for a given field object.
          */
-        getFieldLabel( fieldName:string ): string {
+        getFieldLabel( fieldName: string ): string {
             var listItem = this;
             var fieldDefinition = listItem.getFieldDefinition(fieldName);
             return fieldDefinition.label || fieldDefinition.DisplayName || fieldDefinition.displayName;
@@ -373,7 +411,7 @@ module ap {
          * fieldDefinition.description.  Finally if that have anything it returns an empty string.
          * @returns {string} The description for a given field object.
          */
-        getFieldDescription(fieldName:string): string {
+        getFieldDescription(fieldName: string): string {
             var listItem = this;
             var fieldDefinition = listItem.getFieldDefinition(fieldName);
             return fieldDefinition.description || fieldDefinition.Description || '';
@@ -392,7 +430,7 @@ module ap {
          * we return an empty array.
          * @returns {string[]} An array of choices for a Choice or MultiChoice type field.
          */
-        getFieldChoices(fieldName:string): string[] {
+        getFieldChoices(fieldName: string): string[] {
             var listItem = this;
             var fieldDefinition = listItem.getFieldDefinition(fieldName);
             return fieldDefinition.choices || fieldDefinition.Choices || [];
@@ -420,7 +458,7 @@ module ap {
          * model.factory prototype in apModelFactory.
          * @returns {string} List ID.
          */
-        getListId():string {
+        getListId(): string {
             var model = this.getModel();
             return model.getListId();
         }
@@ -432,8 +470,8 @@ module ap {
          * Abstraction to allow logic in model to be used instead of defining the list location in more than one place.
          * @returns {object} List for the list item.
          */
-        getList():ap.IList {
-            var model:IModel = this.getModel();
+        getList(): ap.IList {
+            var model: IModel = this.getModel();
             return model.getList();
         }
 
@@ -448,7 +486,7 @@ module ap {
          * @param {string} [options.workflowName] Use this value to lookup the templateId and then start the workflow.
          * @returns {promise} Resolves with server response.
          */
-        startWorkflow(options:ap.IStartWorkflowParams): ng.IPromise<any> {
+        startWorkflow(options: ap.IStartWorkflowParams): ng.IPromise<any> {
             var listItem = this,
                 deferred = $q.defer();
 
@@ -534,7 +572,7 @@ module ap {
              * };
          * </pre>
          */
-        deleteAttachment(url:string): ng.IPromise<any> {
+        deleteAttachment(url: string): ng.IPromise<any> {
             var listItem = this;
             return apDataService.deleteAttachment({
                 listItemID: listItem.id,
@@ -562,39 +600,39 @@ module ap {
          * for a site admin.
          * <pre>
          * userPermissions = {
-             *    "ViewListItems":true,
-             *    "AddListItems":true,
-             *    "EditListItems":true,
-             *    "DeleteListItems":true,
-             *    "ApproveItems":true,
-             *    "OpenItems":true,
-             *    "ViewVersions":true,
-             *    "DeleteVersions":true,
-             *    "CancelCheckout":true,
-             *    "PersonalViews":true,
-             *    "ManageLists":true,
-             *    "ViewFormPages":true,
-             *    "Open":true,
-             *    "ViewPages":true,
-             *    "AddAndCustomizePages":true,
-             *    "ApplyThemeAndBorder":true,
-             *    "ApplyStyleSheets":true,
-             *    "ViewUsageData":true,
-             *    "CreateSSCSite":true,
-             *    "ManageSubwebs":true,
-             *    "CreateGroups":true,
-             *    "ManagePermissions":true,
-             *    "BrowseDirectories":true,
-             *    "BrowseUserInfo":true,
-             *    "AddDelPrivateWebParts":true,
-             *    "UpdatePersonalWebParts":true,
-             *    "ManageWeb":true,
-             *    "UseRemoteAPIs":true,
-             *    "ManageAlerts":true,
-             *    "CreateAlerts":true,
-             *    "EditMyUserInfo":true,
-             *    "EnumeratePermissions":true,
-             *    "FullMask":true
+             *    "ViewListItems": true,
+             *    "AddListItems": true,
+             *    "EditListItems": true,
+             *    "DeleteListItems": true,
+             *    "ApproveItems": true,
+             *    "OpenItems": true,
+             *    "ViewVersions": true,
+             *    "DeleteVersions": true,
+             *    "CancelCheckout": true,
+             *    "PersonalViews": true,
+             *    "ManageLists": true,
+             *    "ViewFormPages": true,
+             *    "Open": true,
+             *    "ViewPages": true,
+             *    "AddAndCustomizePages": true,
+             *    "ApplyThemeAndBorder": true,
+             *    "ApplyStyleSheets": true,
+             *    "ViewUsageData": true,
+             *    "CreateSSCSite": true,
+             *    "ManageSubwebs": true,
+             *    "CreateGroups": true,
+             *    "ManagePermissions": true,
+             *    "BrowseDirectories": true,
+             *    "BrowseUserInfo": true,
+             *    "AddDelPrivateWebParts": true,
+             *    "UpdatePersonalWebParts": true,
+             *    "ManageWeb": true,
+             *    "UseRemoteAPIs": true,
+             *    "ManageAlerts": true,
+             *    "CreateAlerts": true,
+             *    "EditMyUserInfo": true,
+             *    "EnumeratePermissions": true,
+             *    "FullMask": true
              * }
          * </pre>
          */
@@ -627,7 +665,7 @@ module ap {
              *      };
          * </pre>
          */
-        getFieldVersionHistory(fieldNames:string[]): ng.IPromise<ap.IListItemVersion> {
+        getFieldVersionHistory(fieldNames: string[]): ng.IPromise<ap.IListItemVersion[]> {
             var deferred = $q.defer();
             var promiseArray = [];
             var listItem = this;
@@ -643,7 +681,7 @@ module ap {
                     strlistID: model.list.getListId(),
                     strlistItemID: listItem.id,
                     strFieldName: fieldDefinition.staticName,
-                    webURL:undefined
+                    webURL: undefined
                 };
 
                 /** Manually set site url if defined, prevents SPServices from making a blocking call to fetch it. */
@@ -704,7 +742,7 @@ module ap {
     /** In the event that a factory isn't specified, just use a
      * standard constructor to allow it to inherit from ListItem */
     export class StandardListItem {
-        constructor(obj?:Object) {
+        constructor(obj?: Object) {
             _.assign(this, obj);
         }
     }

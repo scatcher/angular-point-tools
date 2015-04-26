@@ -27,6 +27,7 @@ module.exports = function (projectDir, paths) {
                 callback(_.flattenDeep(vendorjs
                     .concat(paths.modules)
                     .concat(paths.devjs)
+                    .concat(paths.offlineXMLDir + paths.offlineXMLName)
                     .concat(paths.mocks)
                     .concat(_.pluck(files, 'path'))
                     .concat(paths.specs)));
@@ -48,10 +49,10 @@ module.exports = function (projectDir, paths) {
     //gulp.task('test', ['inject-dev'], function (done) {
         runTests(true, done);
     });
-    gulp.task('test:auto', ['watch'], function (done) {
+    gulp.task('test:auto', ['watch-ts'], function (done) {
         runTests(false, done);
     });
-    gulp.task('test:debug', ['watch'], function (done) {
+    gulp.task('test:debug', ['watch-ts'], function (done) {
         runTests(false, done, {browsers:['Chrome']});
     });
 };

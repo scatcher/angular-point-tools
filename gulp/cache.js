@@ -8,13 +8,15 @@ var log = require('gulp-util').log;
 
 module.exports = function (projectDir, paths) {
 
+
+
     //TODO Make cacheXML logic use gulp.src and process as a stream instead of use the current sync approach
     gulp.task('cacheXML', function () {
         createJSON({
             moduleName: 'angularPoint',
             constantName: paths.offlineXMLConstant,
             fileName: paths.offlineXMLName,
-            dest: paths.offlineXMLDir,
+            dest: paths.offlineXML,
             src: paths.offlineXMLSrc
         });
     });
@@ -33,26 +35,43 @@ module.exports = function (projectDir, paths) {
     function createJSON(options) {
         var offlineXML = {operations: {}, lists: {}};
 
+        /** Ensure destination folder exists */
+        try {
+            fs.readdirSync(paths.tmp);
+        }
+        catch (err) {
+            fs.mkdirSync(paths.tmp);
+        }
+
+
         /** Process each of the src directories */
         options.src.forEach(function (fileDirectory) {
 
-            /** Go through each XML file in the directory */
-            fs.readdirSync(fileDirectory).forEach(function (fileName) {
-                if (fileName.indexOf('.xml') > -1) {
-                    var fileContents = fs.readFileSync(fileDirectory + '/' + fileName, {encoding: 'utf8'});
-                    var operation = fileContents.split('Response')[0].split('<');
-                    operation = operation[operation.length - 1];
-                    if (operation === 'GetListItems' || operation === 'GetListItemChangesSinceToken') {
+            /** Ensure destination folder exists */
+            try {
+                /** Go through each XML file in the directory */
+                fs.readdirSync(fileDirectory).forEach(function (fileName) {
+                    if (fileName && fileName.indexOf('.xml') > -1) {
+                        var fileContents = fs.readFileSync(fileDirectory + '/' + fileName, {encoding: 'utf8'});
+                        var operation = fileContents.split('Response')[0].split('<');
+                        operation = operation[operation.length - 1];
+                        if (operation === 'GetListItems' || operation === 'GetListItemChangesSinceToken') {
 
-                        offlineXML.lists[fileName.split('.xml')[0]] = offlineXML.lists[fileName.split('.xml')[0]] || {};
-                        offlineXML.lists[fileName.split('.xml')[0]][operation] = fileContents;
-                    } else {
-                        /** Create a property on the offlineXML object with a key equaling the file name (without .xml) and
-                         * value being the contents of the file */
-                        offlineXML.operations[operation] = offlineXML.operations[operation] || fileContents;
+                            offlineXML.lists[fileName.split('.xml')[0]] = offlineXML.lists[fileName.split('.xml')[0]] || {};
+                            offlineXML.lists[fileName.split('.xml')[0]][operation] = fileContents;
+                        } else {
+                            /** Create a property on the offlineXML object with a key equaling the file name (without .xml) and
+                             * value being the contents of the file */
+                            offlineXML.operations[operation] = offlineXML.operations[operation] || fileContents;
+                        }
                     }
-                }
-            });
+                });
+            }
+            catch (err) {
+                log("It doesn't appear that the directory exists.");
+                console.log(err);
+
+            }
         });
 
         var fileContents = 'angular.module(\'' + options.moduleName + '\').constant(\'' + options.constantName + '\', ';

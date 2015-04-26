@@ -1,3 +1,4 @@
+/// <reference path="../typings/tsd.d.ts" />
 /// <reference path="ListItem.ts" />
 
 module ap {
@@ -8,74 +9,54 @@ module ap {
         apIndexedCacheFactory, apDecodeService, $q, toastr;
 
     class ModelFactory {
-        constructor(_apCacheService_, _apDataService_, _apListFactory_,
-                    _apQueryFactory_, _apUtilityService_, _apFieldService_, _apConfig_,
-                    _apIndexedCacheFactory_, _apDecodeService_, _$q_, _toastr_, _ListItemFactory_) {
-
-            apCacheService = _apCacheService_;
-            apDataService = _apDataService_;
-            apListFactory = _apListFactory_;
-            ListItemFactory = _ListItemFactory_;
-            apQueryFactory = _apQueryFactory_;
-            apUtilityService = _apUtilityService_;
-            apFieldService = _apFieldService_;
-            apConfig = _apConfig_;
-            apIndexedCacheFactory = _apIndexedCacheFactory_;
-            apDecodeService = _apDecodeService_;
-            $q = _$q_;
-            toastr = _toastr_;
+        constructor($injector) {
+            $q = $injector.get('$q');
+            apCacheService = $injector.get('apCacheService');
+            apConfig = $injector.get('apConfig');
+            apDataService = $injector.get('DataService');
+            apDecodeService = $injector.get('apDecodeService');
+            apFieldService = $injector.get('apFieldService');
+            apIndexedCacheFactory = $injector.get('apIndexedCacheFactory');
+            apListFactory = $injector.get('apListFactory');
+            apQueryFactory = $injector.get('apQueryFactory');
+            apUtilityService = $injector.get('apUtilityService');
+            ListItemFactory = $injector.get('ListItemFactory');
+            toastr = $injector.get('toastr');
         }
 
         create(config) {
             return new Model(config);
         }
 
-        /**
-         * @ngdoc function
-         * @name Model.deepGroup
-         * @description
-         * Creates an indexed cache of entities using a provided property path string to find the key for the cache.
-         * @param {object} object A cached index object.
-         * @param {string} propertyPath Dot separated property path that leads to the desired property to use as a key.
-         * @returns {object} New indexed cache based on the provided property path string.
-         */
-        //deepGroup(object, propertyPath) {
-        //
-        //    function DeepGroup() {
-        //    }
-        //
-        //    /** Use the methods on the IndexedCacheFactory for the base prototype */
-        //    DeepGroup.prototype = apIndexedCacheFactory.IndexedCache;
-        //    /** Overwrite the addEntity method on base prototype to allow for dynamic property path */
-        //    DeepGroup.prototype.addEntity = addEntity;
-        //
-        //
-        //    var group = new DeepGroup();
-        //    _.each(object, function (entity) {
-        //        group.addEntity(entity);
-        //    });
-        //
-        //    return group;
-        //
-        //
-        //    function addEntity(entity) {
-        //        var cache = this;
-        //        var targetProperty = _.deepGet(entity, propertyPath);
-        //        if (targetProperty) {
-        //            cache[targetProperty] = entity;
-        //        }
-        //    }
-        //}
-
     }
 
+    export interface IModel {
+        factory<T>(obj: Object): T;
+        list: IList;
 
-    //interface ModelConfig{
-    //    factory?:Function;
-    //    list?:ap.IList;
-    //    environments:Object;
-    //    //[string]:any;
-    //}
+
+        addNewItem(entity: Object, options?: Object): ng.IPromise<IListItem>;
+        createEmptyItem(overrides?: Object): IListItem;
+        executeQuery<T>(queryName?: string, options?: Object): ng.IPromise<IIndexedCache<T>>;
+        extendListMetadata(options?: Object): ng.IPromise<any>;
+        generateMockData(options?: Object): IListItem[];
+        getAllListItems<T>(): ng.IPromise<IIndexedCache<T>>;
+        getCache(queryName?: string): ICache;
+        getCachedEntities<T>(): IIndexedCache<T>;
+        getCachedEntity(entityId: number): IListItem;
+        getFieldDefinition(fieldName: string): IFieldDefinition;
+        getList(): IList;
+        getListId(): string;
+        getListItemById(entityId: number, options?: Object): ng.IPromise<IListItem>;
+        getModel(): IModel;
+        getQuery(queryName: string): IQuery;
+        isInitialised(): boolean;
+        queries: {getAllListItems: IQuery; [key: string]: IQuery};
+        registerQuery(queryOptions: IQueryOptions): IQuery;
+        resolvePermissions(): IUserPermissionsObject;
+        validateEntity(entity: IListItem, options?: Object): boolean;
+    }
+
 
     /**
      * @ngdoc function
@@ -177,19 +158,19 @@ module ap {
      */
 
     interface QueriesContainer{
-        getAllListItems?:IQuery;
-        [key:string]:IQuery
+        getAllListItems?: IQuery;
+        [key: string]: IQuery
     }
 
     export class Model implements ap.IModel {
         data = [];
         deferredListDefinition;
-        list:ap.IList;
-        factory<T>(obj):T;
-        fieldDefinitionsExtended:boolean = false;
+        list: ap.IList;
+        factory<T>(obj): T;
+        fieldDefinitionsExtended: boolean = false;
         /** Date/Time of last communication with server */
-        lastServerUpdate:Date;
-        queries:QueriesContainer = {};
+        lastServerUpdate: Date;
+        queries: QueriesContainer = {};
         requestForFieldDefinitions;
         constructor(config) {
             var model = this;
@@ -222,7 +203,7 @@ module ap {
          * model.factory prototype in apModelFactory.  See the [List](#/api/List) documentation for more info.
          * @returns {object} Model for the list item.
          */
-        getModel():ap.Model {
+        getModel(): ap.Model {
             return this;
         }
 
@@ -233,7 +214,7 @@ module ap {
          * Allows us to reference the list ID directly from the model.
          * @returns {string} List ID.
          */
-        getListId():string {
+        getListId(): string {
             return this.list.getListId();
         }
 
@@ -245,7 +226,7 @@ module ap {
          * model.factory prototype in apModelFactory.  See the [List](#/api/List) documentation for more info.
          * @returns {object} List for the list item.
          */
-        getList():ap.IList {
+        getList(): ap.IList {
             return this.list;
         }
 
@@ -275,7 +256,7 @@ module ap {
          * </file>
          * </pre>
          */
-        addNewItem<T>(entity:Object, options?:Object): ng.IPromise<T> {
+        addNewItem<T>(entity: Object, options?: Object): ng.IPromise<T> {
             var model = this,
                 deferred = $q.defer();
 
@@ -301,7 +282,7 @@ module ap {
          * @param {object} [overrides] - Optionally extend the new empty item with specific values.
          * @returns {object} Newly created list item.
          */
-        createEmptyItem<T>(overrides?:Object): T {
+        createEmptyItem<T>(overrides?: Object): T {
             var model = this;
             var newItem = {};
             _.each(model.list.customFields, (fieldDefinition) => {
@@ -338,7 +319,7 @@ module ap {
              *  });
          * </pre>
          */
-        executeQuery(queryName?:string, options?:Object): ng.IPromise<ap.IIndexedCache> {
+        executeQuery(queryName?: string, options?: Object): ng.IPromise<ap.IIndexedCache> {
             var model = this;
             var query = model.getQuery(queryName);
             if (query) {
@@ -356,7 +337,7 @@ module ap {
          * @param {object} [options] Pass-through options to apDataService.getList
          * @returns {object} Promise that is resolved once the information has been added.
          */
-        extendListMetadata(options?:Object): ng.IPromise<any> {
+        extendListMetadata(options?: Object): ng.IPromise<any> {
             var model = this,
                 deferred = $q.defer(),
                 defaults = {listName: model.list.getListId()};
@@ -390,7 +371,7 @@ module ap {
          * @param {boolean} [options.staticValue=false] By default all mock data is dynamically created but if set,
          * this will cause static data to be used instead.
          */
-        generateMockData<T>(options?:Object): T[] {
+        generateMockData<T>(options?: Object): T[] {
             var mockData = [],
                 model = this;
 
@@ -408,7 +389,7 @@ module ap {
                     id: count + 1
                 };
                 /** Create an attribute with mock data for each field */
-                _.each(model.list.fields, (field:ap.IFieldDefinition) => {
+                _.each(model.list.fields, (field: ap.IFieldDefinition) => {
                     mock[field.mappedName] = field.getMockData(opts);
                 });
 
@@ -464,7 +445,7 @@ module ap {
          * var namedQueryCache = projectModel.getCache('customQuery');
          * </pre>
          */
-        getCache(queryName:string): ap.ICache {
+        getCache(queryName?: string): ap.ICache {
             var model = this, query, cache;
             query = model.getQuery(queryName);
             if (query && query.indexedCache) {
@@ -478,13 +459,13 @@ module ap {
          * @name Model.getCachedEntity
          * @module Model
          * @description
-         * Attempts to locate a model entity by id.
-         * @param {number} entityId The ID of the requested entity.
-         * @returns {object} Returns either the requested entity or undefined if it's not found.
+         * Attempts to locate a model listItem by id.
+         * @param {number} listItemId The ID of the requested listItem.
+         * @returns {object} Returns either the requested listItem or undefined if it's not found.
          */
-        getCachedEntity<T>(entityId:number): T {
+        getCachedEntity<T>(listItemId: number): T {
             var model = this;
-            return apCacheService.getCachedEntity(model.list.getListId(), entityId);
+            return apCacheService.getCachedEntity(model.list.getListId(), listItemId);
         }
 
         /**
@@ -521,7 +502,7 @@ module ap {
          * @param {string} fieldName Internal field name.
          * @returns {object} Field definition.
          */
-        getFieldDefinition(fieldName:string): ap.IFieldDefinition {
+        getFieldDefinition(fieldName: string): ap.IFieldDefinition {
             var model = this;
             return _.find(model.list.fields, {mappedName: fieldName});
         }
@@ -529,7 +510,7 @@ module ap {
         /**
          * @ngdoc function
          * @name Model.getListItemById
-         * @param {number} entityId Id of the item being requested.
+         * @param {number} listItemId Id of the item being requested.
          * @param {object} options Used to override apDataService defaults.
          * @description
          * Inherited from Model constructor
@@ -538,17 +519,17 @@ module ap {
          * @example
          * <pre>
          * //Taken from a fictitious projectsModel.js
-         * projectModel.getListItemById(12).then(function(entity) {
-             *     //Do something with the located entity
-             *     $scope.project = entity;
+         * projectModel.getListItemById(12).then(function(listItem) {
+             *     //Do something with the located listItem
+             *     $scope.project = listItem;
              * };
          * </pre>
          */
-        getListItemById<T>(entityId:number, options?:Object): ng.IPromise<T> {
+        getListItemById<T>(listItemId: number, options?: Object): ng.IPromise<T> {
             var deferred = $q.defer(),
                 model = this,
                 /** Unique Query Name */
-                queryKey = 'GetListItemById-' + entityId;
+                queryKey = 'GetListItemById-' + listItemId;
 
             /** Register a new Query if it doesn't already exist */
             if (!model.getQuery(queryKey)) {
@@ -561,7 +542,7 @@ module ap {
                     ' <Where>' +
                     '   <Eq>' +
                     '     <FieldRef Name="ID"/>' +
-                    '     <Value Type="Number">' + entityId + '</Value>' +
+                    '     <Value Type="Number">' + listItemId + '</Value>' +
                     '   </Eq>' +
                     ' </Where>' +
                     '</Query>'
@@ -573,7 +554,7 @@ module ap {
 
             model.executeQuery(queryKey)
                 .then( (indexedCache) => {
-                    /** Should return an indexed cache object with a single entity so just return the requested entity */
+                    /** Should return an indexed cache object with a single listItem so just return the requested listItem */
                     deferred.resolve(indexedCache.first());
                 }, (err) => {
                     deferred.reject(err);
@@ -604,7 +585,7 @@ module ap {
          * var namedQuery = projectModel.getQuery('customQuery');
          * </pre>
          */
-        getQuery(queryName:string): ap.IQuery {
+        getQuery(queryName: string): ap.IQuery {
             var model = this, query;
             if (_.isObject(model.queries[queryName])) {
                 /** The named query exists */
@@ -636,39 +617,39 @@ module ap {
          * for a site admin.
          * <pre>
          * perm = {
-            *    "ViewListItems":true,
-            *    "AddListItems":true,
-            *    "EditListItems":true,
-            *    "DeleteListItems":true,
-            *    "ApproveItems":true,
-            *    "OpenItems":true,
-            *    "ViewVersions":true,
-            *    "DeleteVersions":true,
-            *    "CancelCheckout":true,
-            *    "PersonalViews":true,
-            *    "ManageLists":true,
-            *    "ViewFormPages":true,
-            *    "Open":true,
-            *    "ViewPages":true,
-            *    "AddAndCustomizePages":true,
-            *    "ApplyThemeAndBorder":true,
-            *    "ApplyStyleSheets":true,
-            *    "ViewUsageData":true,
-            *    "CreateSSCSite":true,
-            *    "ManageSubwebs":true,
-            *    "CreateGroups":true,
-            *    "ManagePermissions":true,
-            *    "BrowseDirectories":true,
-            *    "BrowseUserInfo":true,
-            *    "AddDelPrivateWebParts":true,
-            *    "UpdatePersonalWebParts":true,
-            *    "ManageWeb":true,
-            *    "UseRemoteAPIs":true,
-            *    "ManageAlerts":true,
-            *    "CreateAlerts":true,
-            *    "EditMyUserInfo":true,
-            *    "EnumeratePermissions":true,
-            *    "FullMask":true
+            *    "ViewListItems": true,
+            *    "AddListItems": true,
+            *    "EditListItems": true,
+            *    "DeleteListItems": true,
+            *    "ApproveItems": true,
+            *    "OpenItems": true,
+            *    "ViewVersions": true,
+            *    "DeleteVersions": true,
+            *    "CancelCheckout": true,
+            *    "PersonalViews": true,
+            *    "ManageLists": true,
+            *    "ViewFormPages": true,
+            *    "Open": true,
+            *    "ViewPages": true,
+            *    "AddAndCustomizePages": true,
+            *    "ApplyThemeAndBorder": true,
+            *    "ApplyStyleSheets": true,
+            *    "ViewUsageData": true,
+            *    "CreateSSCSite": true,
+            *    "ManageSubwebs": true,
+            *    "CreateGroups": true,
+            *    "ManagePermissions": true,
+            *    "BrowseDirectories": true,
+            *    "BrowseUserInfo": true,
+            *    "AddDelPrivateWebParts": true,
+            *    "UpdatePersonalWebParts": true,
+            *    "ManageWeb": true,
+            *    "UseRemoteAPIs": true,
+            *    "ManageAlerts": true,
+            *    "CreateAlerts": true,
+            *    "EditMyUserInfo": true,
+            *    "EnumeratePermissions": true,
+            *    "FullMask": true
             * }
          * </pre>
          */
@@ -703,21 +684,21 @@ module ap {
          * @module Model
          * @description
          * Constructor that allows us create a static query with the option to build dynamic queries as seen in the
-         * third example.  This construct is a passthrough to [SPServices](http://spservices.codeplex.com/)
+         * third example.  This construct is a passthrough to [SPServices](http: //spservices.codeplex.com/)
          * @param {object} [queryOptions] Optional options to pass through to the
          * [dataService](#/api/dataService.executeQuery).
          * @param {string} [queryOptions.name=apConfig.defaultQueryName] Optional name of the new query (recommended but will
          * default to 'Primary' if not specified)
          * @param {string} [queryOptions.operation="GetListItemChangesSinceToken"] Defaults to
-         * [GetListItemChangesSinceToken](http://msdn.microsoft.com/en-us/library/lists.lists.getlistitemchangessincetoken%28v=office.12%29.aspx)
+         * [GetListItemChangesSinceToken](http: //msdn.microsoft.com/en-us/library/lists.lists.getlistitemchangessincetoken%28v=office.12%29.aspx)
          * but for a smaller payload and faster response you can use
-         * [GetListItems](http://spservices.codeplex.com/wikipage?title=GetListItems&referringTitle=Lists).
+         * [GetListItems](http: //spservices.codeplex.com/wikipage?title=GetListItems&referringTitle=Lists).
          * @param {boolean} [queryOptions.cacheXML=false] Typically don't need to store the XML response because it
          * has already been parsed into JS objects.
          * @param {string} [queryOptions.offlineXML] Optionally reference a specific XML file to use for this query instead
          * of using the shared XML file used by all queries on this model.  Useful to mock custom query results.
          * @param {string} [queryOptions.query] CAML Query - Josh McCarty has a good quick reference
-         * [here](http://joshmccarty.com/2012/06/a-caml-query-quick-reference)
+         * [here](http: //joshmccarty.com/2012/06/a-caml-query-quick-reference)
          * @param {string} [queryOptions.queryOptions]
          * <pre>
          * // Default options
@@ -828,7 +809,7 @@ module ap {
      * };
          pre>
          */
-        registerQuery(queryOptions:ap.IQueryOptions): ap.IQuery {
+        registerQuery(queryOptions: ap.IQueryOptions): ap.IQuery {
             var model = this;
 
             var defaults = {
@@ -846,108 +827,18 @@ module ap {
 
         /**
          * @ngdoc function
-         * @name Model.searchLocalCache
-         * @description
-         * Search functionality that allow for deeply searching an array of objects for the first
-         * record matching the supplied value.  Additionally it maps indexes to speed up future calls.  It
-         * currently rebuilds the mapping when the length of items in the local cache has changed or when the
-         * rebuildIndex flag is set.
-         *
-         * @param {*} value The value or array of values to compare against.
-         * @param {object} [options] Object containing optional parameters.
-         * @param {string} [options.propertyPath] The dot separated propertyPath.
-         * <pre>
-         * 'project.lookupId'
-         * </pre>
-         * @param {object} [options.cacheName] Required if using a data source other than primary cache.
-         * @param {object} [options.localCache=model.getCache()] Array of objects to search (Default model.getCache()).
-         * @param {boolean} [options.rebuildIndex=false] Ignore previous index and rebuild.
-         *
-         * @returns {(object|object[])} Either the object(s) that you're searching for or undefined if not found.
-         */
-        //searchLocalCache(value, options) {
-        //    var model = this,
-        //        searchCache,
-        //        searchIndex,
-        //        searchResults,
-        //        defaults = {
-        //            propertyPath: 'id',
-        //            localCache: model.getCache(),
-        //            cacheName: 'main',
-        //            rebuildIndex: false
-        //        };
-        //    /** Extend defaults with any provided options */
-        //    var opts = _.extend({}, defaults, options);
-        //
-        //    if (opts.propertyPath === 'id') {
-        //        searchIndex = opts.localCache;
-        //    } else {
-        //        /** Create a cache if it doesn't already exist */
-        //        model._cachedIndexes = model._cachedIndexes || {};
-        //        model._cachedIndexes[opts.cacheName] = model._cachedIndexes[opts.cacheName] || {};
-        //        searchCache = model._cachedIndexes[opts.cacheName];
-        //        var properties = opts.propertyPath.split('.');
-        //        /** Create cache location with the same property map as the one provided
-        //         * @example
-        //         * <pre>
-        //         * model._cachedIndexes{
-        //         *      main: { //Default Cache name unless otherwise specified
-        //         *          lookup: {
-        //         *              lookupId: { ///// Cache Location for 'lookup.lookupId' //////// }
-        //         *          },
-        //         *          user: {
-        //         *              lookupValue: { ///// Cache Location for 'user.lookupValue' //////// }
-        //         *          }
-        //         *      }
-        //         * }
-        //         * </pre>
-        //         */
-        //        _.each(properties, function (attribute) {
-        //            searchCache[attribute] = searchCache[attribute] || {};
-        //            /** Update cache reference to another level down the cache object */
-        //            searchCache = searchCache[attribute];
-        //        });
-        //
-        //        /** Remap if no existing map, the number of items in the array has changed, or the rebuild flag is set */
-        //        if (!_.isNumber(searchCache.count) || searchCache.count !== opts.localCache.count() || opts.rebuildIndex) {
-        //            searchCache.indexedCache = deepGroup(opts.localCache, opts.propertyPath);
-        //            /** Store the current length of the array for future comparisons */
-        //            searchCache.count = opts.localCache.count();
-        //            /** Simple counter to gauge the frequency we rebuild cache */
-        //            searchCache.buildCount = searchCache.buildCount || 0;
-        //            searchCache.buildCount++;
-        //        }
-        //        searchIndex = searchCache.indexedCache;
-        //    }
-        //
-        //    /** Allow an array of values to be passed in */
-        //    if (_.isArray(value)) {
-        //        searchResults = [];
-        //        _.each(value, function (key) {
-        //            searchResults.push(searchIndex[key]);
-        //        });
-        //        /** Primitive passed in */
-        //    } else {
-        //        searchResults = searchIndex[value];
-        //    }
-        //    return searchResults;
-        //}
-
-
-        /**
-         * @ngdoc function
          * @name Model.validateEntity
          * @module Model
          * @description
          * Uses the custom fields defined in an model to ensure each field (required = true) is evaluated
          * based on field type
          *
-         * @param {object} entity SharePoint list item.
+         * @param {object} listItem SharePoint list item.
          * @param {object} [options] Object containing optional parameters.
          * @param {boolean} [options.toast=true] Should toasts be generated to alert the user of issues.
          * @returns {boolean} Evaluation of validity.
          */
-        validateEntity(entity:ListItem, options?:Object): boolean {
+        validateEntity(listItem: ListItem, options?: Object): boolean {
             var valid = true,
                 model = this;
 
@@ -962,24 +853,24 @@ module ap {
                 return _.isObject(fieldValue) && _.isNumber(fieldValue.lookupId);
             };
 
-            _.each(model.list.customFields, (fieldDefinition:ap.IFieldDefinition) => {
-                var fieldValue = entity[fieldDefinition.mappedName];
+            _.each(model.list.customFields, (fieldDefinition: ap.IFieldDefinition) => {
+                var fieldValue = listItem[fieldDefinition.mappedName];
                 var fieldDescriptor = '"' + fieldDefinition.objectType + '" value.';
                 /** Only evaluate required fields */
                 if ((fieldDefinition.required || fieldDefinition.Required) && valid) {
                     switch (fieldDefinition.objectType) {
-                        case 'Boolean':
+                        case 'Boolean': 
                             valid = _.isBoolean(fieldValue);
                             break;
-                        case 'DateTime':
+                        case 'DateTime': 
                             valid = _.isDate(fieldValue);
                             break;
-                        case 'Lookup':
-                        case 'User':
+                        case 'Lookup': 
+                        case 'User': 
                             valid = checkObject(fieldValue);
                             break;
-                        case 'LookupMulti':
-                        case 'UserMulti':
+                        case 'LookupMulti': 
+                        case 'UserMulti': 
                             /** Ensure it's a valid array containing objects */
                             valid = _.isArray(fieldValue) && fieldValue.length > 0;
                             if (valid) {
@@ -994,7 +885,7 @@ module ap {
                                 });
                             }
                             break;
-                        default:
+                        default: 
                             /** Evaluate everything else as a string */
                             valid = !_.isEmpty(fieldValue);
 
