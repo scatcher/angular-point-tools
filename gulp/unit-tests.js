@@ -45,8 +45,7 @@ module.exports = function (projectDir, paths) {
         });
     }
 
-    gulp.task('test', function (done) {
-    //gulp.task('test', ['inject-dev'], function (done) {
+    gulp.task('test', ['ts'], function (done) {
         runTests(true, done);
     });
     gulp.task('test:auto', ['watch-ts'], function (done) {
