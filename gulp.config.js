@@ -76,9 +76,10 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         ],
         projectjs: [
             appDir + "**/*.module.js",
-            appDir + "**/*.js",
-            '!' + app + '/**/*.spec.js',
-            '!' + app + '/**/*.mock.js'
+            appDir + "**/*.js"
+            //TODO Investigate why the below two aren't working.
+            //'!' + app + '/**/*.spec.js',
+            //'!' + app + '/**/*.mock.js'
         ],
         mocks: testDir + '**/*.mock.js',
         specs: [
