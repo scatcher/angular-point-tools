@@ -52,6 +52,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         report: projectDir + "report/",
         server: server,
         serverDir: serverDir,
+        targetECMAScriptVersion: 'ES5',
         templateCache: templateCache,
         templatesModule: 'templateCache',
         tmp: tmp,
