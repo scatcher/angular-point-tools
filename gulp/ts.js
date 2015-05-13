@@ -11,27 +11,32 @@ var tsd = require('tsd');
 var log = require('gulp-util').log;
 var typescript = require('gulp-typescript');
 
-module.exports = function(projectDir, paths) {
+module.exports = function (projectDir, paths) {
     var tsdApi = new tsd.getAPI(paths.tsdJson);
 
-    gulp.task('ts', function() {
+    gulp.task('ts', function () {
         return gulp.src(paths.tsFiles)
             .pipe(sourcemaps.init())
             //.pipe(tslint())
             //.pipe(tslint.report('prose', { emitError: false }))
-            .pipe(typescript({sortOutput: true, declarationFiles:true, target: paths.targetECMAScriptVersion}))
+            .pipe(typescript({
+                sortOutput: true,
+                //declarationFiles: true,
+                target: paths.targetECMAScriptVersion,
+                typescript: require('typescript')
+            }))
             .pipe(sourcemaps.write())
-            .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative:true}))
+            .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative: true}))
             .pipe(gulp.dest(paths.serverDir))
             .pipe($.size());
     });
 
-    gulp.task('inject-ts', ['clean-server', 'ts'], function() {
+    gulp.task('inject-ts', ['clean-server', 'ts'], function () {
         var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
 
         var tempScripts = gulp.src([paths.serverDir + '**/*.js'])
             //.pipe($.angularFilesort());
-            .pipe($.order(sortOutput, {base: paths.server}),{read: false});
+            .pipe($.order(sortOutput, {base: paths.server}), {read: false});
 
         return gulp.src(paths.appDir + 'index.html')
             .pipe($.inject(tempScripts, {name: 'inject-ts', addRootSlash: false}))
