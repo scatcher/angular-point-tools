@@ -17,19 +17,19 @@ module.exports = function (projectDir, paths) {
     /** Much faster reloads if we declare the project only once */
     var tsProject = typescript.createProject({
         noExternalResolve: true,
-                sortOutput: true,
-                target: paths.targetECMAScriptVersion,
-                typescript: require('typescript')
+        sortOutput: true,
+        target: paths.targetECMAScriptVersion,
+        typescript: require('typescript')
     });
 
     gulp.task('ts', function () {
 
         var tsResult = gulp.src(paths.tsFiles)
-            .pipe(sourcemaps.init()) //Sourcemaps will be generated
+            .pipe(sourcemaps.init({loadMaps: true})) //Sourcemaps will be generated
             .pipe(typescript(tsProject));
 
         return tsResult.js
-            .pipe(sourcemaps.write('.', { includeContent: true, sourceRoot: '../../..' }))
+            .pipe(sourcemaps.write('.', { sourceRoot: '/' })) //Place maps in same directory as transpiled ES5
             .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative: true}))
             .pipe(gulp.dest(paths.serverDir));
 
