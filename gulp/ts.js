@@ -14,21 +14,25 @@ var typescript = require('gulp-typescript');
 module.exports = function (projectDir, paths) {
     var tsdApi = new tsd.getAPI(paths.tsdJson);
 
-    gulp.task('ts', function () {
-        return gulp.src(paths.tsFiles)
-            .pipe(sourcemaps.init())
-            //.pipe(tslint())
-            //.pipe(tslint.report('prose', { emitError: false }))
-            .pipe(typescript({
+    /** Much faster reloads if we declare the project only once */
+    var tsProject = typescript.createProject({
+        noExternalResolve: true,
                 sortOutput: true,
-                //declarationFiles: true,
                 target: paths.targetECMAScriptVersion,
                 typescript: require('typescript')
-            }))
-            .pipe(sourcemaps.write())
+    });
+
+    gulp.task('ts', function () {
+
+        var tsResult = gulp.src(paths.tsFiles)
+            .pipe(sourcemaps.init()) //Sourcemaps will be generated
+            .pipe(typescript(tsProject));
+
+        return tsResult.js
+            .pipe(sourcemaps.write('.', { includeContent: true, sourceRoot: '../../..' }))
             .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative: true}))
-            .pipe(gulp.dest(paths.serverDir))
-            .pipe($.size());
+            .pipe(gulp.dest(paths.serverDir));
+
     });
 
     gulp.task('inject-ts', ['clean-server', 'ts'], function () {
