@@ -34,14 +34,15 @@ module.exports = function(projectDir, paths) {
      */
     gulp.task('images', function () {
         return gulp.src(paths.images)
-            .pipe($.imagemin({
-                //.pipe($.cache($.imagemin({
-                optimizationLevel: 3,
-                progressive: true,
-                interlaced: true
-            }))
-            .pipe(gulp.dest(paths.build + 'images'))
-            .pipe($.size());
+            //TODO Figure out if we can skip imagemin altogether
+            //.pipe($.imagemin({
+            //    //.pipe($.cache($.imagemin({
+            //    optimizationLevel: 3,
+            //    progressive: true,
+            //    interlaced: true
+            //}))
+            .pipe(gulp.dest(paths.build + 'images'));
+            //.pipe($.size());
     });
 
 };
