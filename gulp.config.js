@@ -57,7 +57,6 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         templatesModule: 'templateCache',
         tmp: tmp,
         tmpDir: tmpDir,
-        tsdJson: projectDir + 'tsd.json',
         tsFiles: [
             app + '/**/*.ts',
             //nodeModules + 'angular-point*/ts/**/*.ts',

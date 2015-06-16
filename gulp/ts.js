@@ -7,12 +7,10 @@ var $ = require('gulp-load-plugins')({
 
 var sourcemaps = require('gulp-sourcemaps');
 var tslint = require('gulp-tslint');
-var tsd = require('tsd');
 var log = require('gulp-util').log;
 var typescript = require('gulp-typescript');
 
 module.exports = function (projectDir, paths) {
-    var tsdApi = new tsd.getAPI(paths.tsdJson);
 
     /** Much faster reloads if we declare the project only once */
     var tsProject = typescript.createProject({
@@ -51,57 +49,6 @@ module.exports = function (projectDir, paths) {
         var del = require('del');
         return del([paths.server]);
     });
-
-
-    gulp.task('tsd:install', function () {
-        var bower = paths.bower.json;
-
-        var dependencies = [].concat(
-            Object.keys(bower.dependencies),
-            Object.keys(bower.devDependencies)
-        );
-
-        var query = new tsd.Query();
-        dependencies.forEach(function (dependency) {
-            query.addNamePattern(dependency);
-        });
-
-        var options = new tsd.Options();
-        options.resolveDependencies = true;
-        options.overwriteFiles = true;
-        options.saveBundle = true;
-
-        return tsdApi.readConfig()
-            .then(function () {
-                return tsdApi.select(query, options);
-            })
-            .then(function (selection) {
-                return tsdApi.install(selection, options);
-            })
-            .then(function (installResult) {
-                var written = Object.keys(installResult.written.dict);
-                var removed = Object.keys(installResult.removed.dict);
-                var skipped = Object.keys(installResult.skipped.dict);
-
-                written.forEach(function (dts) {
-                    $.util.log('Definition file written: ' + dts);
-                });
-
-                removed.forEach(function (dts) {
-                    $.util.log('Definition file removed: ' + dts);
-                });
-
-                skipped.forEach(function (dts) {
-                    $.util.log('Definition file skipped: ' + dts);
-                });
-            });
-    });
-
-    gulp.task('tsd:purge', function () {
-        return tsdApi.purge(true, true);
-    });
-
-    gulp.task('tsd', ['tsd:install']);
 
     /**
      * Generates the app.d.ts references file dynamically from all application *.ts files.
