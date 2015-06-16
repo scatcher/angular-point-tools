@@ -35,7 +35,7 @@ module.exports = function (projectDir, paths) {
 
     });
 
-    gulp.task('inject-ts', ['clean-server', 'ts'], function () {
+    gulp.task('inject-ts', ['clean-server', 'ts', 'gen-ts-refs'], function () {
         var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
 
         var tempScripts = gulp.src([paths.serverDir + '**/*.js'])
@@ -113,7 +113,7 @@ module.exports = function (projectDir, paths) {
      */
     gulp.task('gen-ts-refs', function () {
         var target = gulp.src(paths.appTypeScriptReferences);
-        var sources = gulp.src([paths.tsFiles], {read: false});
+        var sources = gulp.src(paths.tsFiles, {read: false});
         return target.pipe($.inject(sources, {
             starttag: '//{',
             endtag: '//}',
