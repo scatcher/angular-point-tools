@@ -58,9 +58,9 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         templatesModule: 'templateCache',
         tmp: tmp,
         tmpDir: tmpDir,
-        tsFiles: [ app + '/**/*.ts', 'typings/**/*.ts'],
+        tsFiles: app + '/**/*.ts',
         tsSortOutputName: 'sortOutput.json',
-        tsTests: ['typings/**/*.ts', 'test/**/*.ts'],
+        tsTests: 'test/**/*.ts',
         tsWatchDebounce: 750, //Miliseconds to debounce between watch events
         typings: typings,
         typingsDir: typingsDir,
