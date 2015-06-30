@@ -20,24 +20,41 @@ module.exports = function (projectDir, paths) {
         typescript: require('typescript')
     });
 
+    var tsTest = typescript.createProject({
+        noExternalResolve: true,
+        sortOutput: true,
+        typescript: require('typescript')
+    });
+
     gulp.task('ts', function () {
 
         var tsResult = gulp.src(paths.tsFiles)
             .pipe(sourcemaps.init({loadMaps: true})) //Sourcemaps will be generated
-            .pipe(typescript(tsProject));
+            .pipe(typescript(tsProject, undefined, 'defaultReporter')); //Don't display error messages in console
 
         return tsResult.js
             .pipe(sourcemaps.write('.', { sourceRoot: '/' })) //Place maps in same directory as transpiled ES5
             .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative: true}))
             .pipe(gulp.dest(paths.serverDir));
-
     });
+
+    gulp.task('ts-test', function() {
+        var tsResult = gulp.src('test/**/*.ts')
+            .pipe(sourcemaps.init({loadMaps: true})) //Sourcemaps will be generated
+            .pipe(typescript(tsTest, undefined, 'defaultReporter')); //Don't display error messages in console
+
+        return tsResult.js
+            // .pipe(sourcemaps.write('.')) //Place maps in same directory as transpiled ES5
+            .pipe(sourcemaps.write('.'), { sourceRoot: '/' }) //Place maps in same directory as transpiled ES5
+            // .pipe($.toJson({filename: paths.tmpDir + paths.tsSortOutputName, relative: true}))
+            .pipe(gulp.dest('test'));
+
+    })
 
     gulp.task('inject-ts', ['clean-server', 'ts', 'gen-ts-refs'], function () {
         var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
 
         var tempScripts = gulp.src([paths.serverDir + '**/*.js'])
-            //.pipe($.angularFilesort());
             .pipe($.order(sortOutput, {base: paths.server}), {read: false});
 
         return gulp.src(paths.appDir + 'index.html')

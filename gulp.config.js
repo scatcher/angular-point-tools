@@ -39,6 +39,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         distjs: [tmpDir + templateCache],
         docs: projectDir + "docs/",
         gulpFolder: apToolsDir + '/gulp',
+        htmltemplates: appDir + "*/**/*.html",
         index: appDir + "index.html",
         lessOutput: appDir + 'styles/css',
         nodeModules: nodeModules,
@@ -57,17 +58,14 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         templatesModule: 'templateCache',
         tmp: tmp,
         tmpDir: tmpDir,
-        tsFiles: [
-            app + '/**/*.ts',
-            //nodeModules + 'angular-point*/ts/**/*.ts',
-            bower.directory + 'angular-point*/ts/**/*.ts'
-        ],
+        tsFiles: [ app + '/**/*.ts', 'typings/**/*.ts'],
         tsSortOutputName: 'sortOutput.json',
+        tsTests: ['typings/**/*.ts', 'test/**/*.ts'],
+        tsWatchDebounce: 750, //Miliseconds to debounce between watch events
         typings: typings,
         typingsDir: typingsDir,
         userefSearchPaths: ['.', app, server],
         //Want everything besides index.html, so ignore the root appDir directory
-        htmltemplates: appDir + "*/**/*.html",
         projectcss: [
             appDir + "styles/**/*.css",
             bower.directory + "angular-point-discussion-thread/dist/apDiscussionThread.css"

@@ -75,7 +75,9 @@ module.exports = function (projectDir, paths) {
     
     gulp.task('uglify-vendor-js', function () {
         return gulp.src('dist/scripts/vendor.js')
-            .pipe(uglify({ mangle: true }))
+            .pipe($.bytediff.start())
+            .pipe($.uglify({ mangle: true }))
+            .pipe($.bytediff.stop(bytediffFormatter))
             .pipe(gulp.dest('dist/scripts'));
     });    
 

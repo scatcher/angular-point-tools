@@ -28,8 +28,8 @@ module.exports = function (projectDir, paths) {
                     .concat(paths.modules)
                     .concat(paths.devjs)
                     .concat(paths.offlineXMLDir + paths.offlineXMLName)
-                    .concat(paths.mocks)
                     .concat(_.pluck(files, 'path'))
+                    .concat(paths.mocks)
                     .concat(paths.specs)));
             }));
     }
@@ -45,7 +45,7 @@ module.exports = function (projectDir, paths) {
         });
     }
 
-    gulp.task('test', ['ts'], function (done) {
+    gulp.task('test', ['ts', 'ts-test'], function (done) {
         runTests(true, done);
     });
     gulp.task('test:auto', ['watch-ts'], function (done) {

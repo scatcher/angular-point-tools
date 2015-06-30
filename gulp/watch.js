@@ -47,31 +47,17 @@ module.exports = function (projectDir, paths) {
 
         gulp.watch(paths.projectless, ['styles']);
 
-        gulp.watch(paths.serverDir + '**/*.js')
+        gulp.watch(paths.serverDir + '**/*.js', {debounceDelay: paths.tsWatchDebounce})
             .on('change', $.livereload.changed);
 
     });
 
-    gulp.task('watch-ts', ['ts'], function () {
+    gulp.task('watch-ts', ['ts', 'ts-test'], function () {
         gulp.watch(paths.tsFiles, ['ts']);
+        gulp.watch(paths.tsTests, ['ts-test']);
     });
 
     gulp.task('serve', ['watch']);
-
-    // gulp.task('serve', ['inject-dev', 'styles'], function () {
-    //     browserSync.init({
-    //         server: {
-    //             baseDir: ["./", "app"],
-    //             index: paths.index
-    //         }
-    //     });
-
-    //     gulp.watch(paths.tsFiles, ['ts']);
-    //     gulp.watch(paths.projectless, ['styles']);
-    //     gulp.watch("app/**/*.ts", { events: ['add'] }, ['ts', 'inject-dev']);
-    //     gulp.watch(".tmp/**/*.js").on('change', browserSync.reload);
-    //     gulp.watch("app/**/*.html").on('change', browserSync.reload);
-    // });
 
 
 };
