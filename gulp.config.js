@@ -59,6 +59,7 @@ module.exports = function (apToolsDir, projectDir, projectConfig) {
         tmp: tmp,
         tmpDir: tmpDir,
         tsFiles: app + '/**/*.ts',
+        tsReporter: 'nullReporter', // 'nullReporter' || 'defaultReporter' || 'longReporter'
         tsSortOutputName: 'sortOutput.json',
         tsTests: 'test/**/*.ts',
         tsWatchDebounce: 750, //Miliseconds to debounce between watch events

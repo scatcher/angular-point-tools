@@ -1,6 +1,6 @@
 {
   "name": "angular-point-tools",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Build tools shared by angular-point projects.",
   "main": "gulpfile.js",
   "scripts": {

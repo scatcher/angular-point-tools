@@ -30,7 +30,7 @@ module.exports = function (projectDir, paths) {
 
         var tsResult = gulp.src(paths.tsFiles)
             .pipe(sourcemaps.init({loadMaps: true})) //Sourcemaps will be generated
-            .pipe(typescript(tsProject, undefined, 'defaultReporter')); //Don't display error messages in console
+            .pipe(typescript(tsProject, undefined, paths.tsReporter)); //Don't display error messages in console
 
         return tsResult.js
             .pipe(sourcemaps.write('.', { sourceRoot: '/' })) //Place maps in same directory as transpiled ES5
@@ -41,7 +41,7 @@ module.exports = function (projectDir, paths) {
     gulp.task('ts-test', function() {
         var tsResult = gulp.src('test/**/*.ts')
             .pipe(sourcemaps.init({loadMaps: true})) //Sourcemaps will be generated
-            .pipe(typescript(tsTest, undefined, 'defaultReporter')); //Don't display error messages in console
+            .pipe(typescript(tsTest, undefined, paths.tsReporter)); //Don't display error messages in console
 
         return tsResult.js
             // .pipe(sourcemaps.write('.')) //Place maps in same directory as transpiled ES5
