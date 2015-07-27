@@ -62,7 +62,7 @@ module.exports = function (projectDir, paths) {
             .pipe($.replace('ui-grid.woff', '../fonts/ui-grid.woff'))
             .pipe($.replace('styles/fonts', 'fonts'))
             //.pipe($.replace('bower_components/font-awesome/fonts', 'fonts'))
-            .pipe($.replace('bower_components/bootstrap/fonts', '../fonts'))
+            .pipe($.replace('../../../bower_components/bootstrap/fonts', '../fonts'))
             //.pipe($.replace('bower_components/font-awesome/fonts', 'fonts'))
             .pipe($.bytediff.stop(bytediffFormatter))
             .pipe(cssFilter.restore())
@@ -72,14 +72,14 @@ module.exports = function (projectDir, paths) {
             .pipe(gulp.dest(paths.build))
             .pipe($.size());
     });
-    
+
     gulp.task('uglify-vendor-js', function () {
         return gulp.src('dist/scripts/vendor.js')
             .pipe($.bytediff.start())
             .pipe($.uglify({ mangle: true }))
             .pipe($.bytediff.stop(bytediffFormatter))
             .pipe(gulp.dest('dist/scripts'));
-    });    
+    });
 
 
 ////////////////

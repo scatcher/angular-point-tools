@@ -22,7 +22,7 @@ module.exports = function(projectDir, paths) {
     gulp.task('fonts', function () {
         return gulp.src($.mainBowerFiles())
             //return gulp.src(config.vendorcss)
-            .pipe($.filter('**/*.{eot,svg,ttf,woff}'))
+            .pipe($.filter('**/*.{eot,svg,ttf,woff,woff2}'))
             .pipe($.flatten())
             .pipe(gulp.dest(paths.build + 'fonts'))
             .pipe($.size());
