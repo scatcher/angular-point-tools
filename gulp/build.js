@@ -25,17 +25,16 @@ module.exports = function (projectDir, paths) {
      */
     gulp.task('templatecache', function () {
         log('Creating an AngularJS $templateCache');
-        log(paths.htmltemplates);
         return gulp
             .src(paths.htmltemplates)
-            .pipe($.bytediff.start())
+            // .pipe($.bytediff.start())
             .pipe($.minifyHtml({empty: true}))
             .pipe($.angularTemplatecache(paths.templateCache, {
                 module: paths.templatesModule,
                 standalone: true,
                 root: ''
             }))
-            .pipe($.bytediff.stop(bytediffFormatter))
+            // .pipe($.bytediff.stop(bytediffFormatter))
             .pipe(gulp.dest(projectDir + '.tmp'));
     });
     
@@ -49,7 +48,7 @@ module.exports = function (projectDir, paths) {
     });
    
     
-    gulp.task('build-app-js', ['inject-dist', 'templatecache'], function () {
+    gulp.task('build-app-js', ['ts', 'templatecache'], function () {
         var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
         var projectReferenes = _.chain(sortOutput)
             .filter(function (ref) {
@@ -64,6 +63,7 @@ module.exports = function (projectDir, paths) {
                     
         return gulp.src(_.flatten([paths.modules, projectReferenes, projectDir + '.tmp/' + paths.templateCache]))
             .pipe($.sourcemaps.init({ loadMaps: true }))
+            // .pipe($.ngAnnotate())
             .pipe($.concat('scripts.js'))
             // .pipe($.uglify({mangle: true}))
             .pipe($.sourcemaps.write('.'))
