@@ -1,6 +1,9 @@
+/// <reference path="../gulp.config.js" />
 'use strict';
 
 var gulp = require('gulp');
+var _ = require('lodash');
+var angularFilesort = require('gulp-angular-filesort');
 
 var $ = require('gulp-load-plugins')({
     pattern: ['gulp-*', 'main-bower-files']
@@ -8,8 +11,7 @@ var $ = require('gulp-load-plugins')({
 var log = $.util.log;
 
 module.exports = function (projectDir, paths) {
-    //var pkg = require(paths.packageJson);
-
+    
     gulp.task('build', [
         'html',
         'images',
@@ -36,23 +38,47 @@ module.exports = function (projectDir, paths) {
             .pipe($.bytediff.stop(bytediffFormatter))
             .pipe(gulp.dest(projectDir + '.tmp'));
     });
+    
+    gulp.task('build-vendor-js', function () {
+        return gulp.src(paths.vendorjs)
+            .pipe($.sourcemaps.init({ loadMaps: true }))
+            .pipe($.concat('vendor.js'))
+            .pipe($.uglify({mangle: true}))
+            .pipe($.sourcemaps.write('.'))
+            .pipe(gulp.dest(paths.build + 'scripts'));
+    });
+    
+    gulp.task('build-app-js', ['inject-dist', 'templatecache'], function () {
+        var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
+        var projectReferenes = _.chain(sortOutput)
+            .filter(function(ref) {
+                if(ref.indexOf('.map') === -1) {
+                    return true;
+                }
+            })
+            .map(function(ref) {
+                return paths.serverDir + ref;
+            })
+            .value()
+                    
+        return gulp.src(_.flatten([paths.modules, projectReferenes, projectDir + '.tmp/' + paths.templateCache]))
+            .pipe($.sourcemaps.init({ loadMaps: true }))
+            .pipe($.concat('scripts.js'))
+            // .pipe($.uglify({mangle: true}))
+            .pipe($.sourcemaps.write('.'))
+            .pipe(gulp.dest(paths.build + 'scripts'));
+    });
+    
 
-    gulp.task('html', ['inject-dist'], function () {
+    gulp.task('html', ['build-vendor-js', 'build-app-js'], function () {
         var jsFilter = $.filter('**/*.js');
         var cssFilter = $.filter('**/*.css');
         var assets;
 
         return gulp.src(paths.index)
-            .pipe(assets = $.useref.assets({searchPath: paths.userefSearchPaths}))
-
+            .pipe(assets = $.useref.assets({searchPath: paths.userefSearchPaths, noconcat: true}))
+            //Filter out all JS because we're handling vendor.js and app.js manually above
             .pipe(jsFilter)
-            //.pipe($.ngAnnotate({add: true, single_quotes: true}))
-            //.pipe($.bytediff.start())
-            //.pipe($.sourcemaps.init())
-            //.pipe($.uglify({mangle: true}))
-            //.pipe($.sourcemaps.write())
-            //.pipe($.bytediff.stop(bytediffFormatter))
-            .pipe(jsFilter.restore())
 
             .pipe(cssFilter)
             //TODO Create a regexp to replace all font in ui-grid
