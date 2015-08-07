@@ -47,19 +47,20 @@ module.exports = function (projectDir, paths) {
             .pipe($.sourcemaps.write('.'))
             .pipe(gulp.dest(paths.build + 'scripts'));
     });
+   
     
     gulp.task('build-app-js', ['inject-dist', 'templatecache'], function () {
         var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
         var projectReferenes = _.chain(sortOutput)
-            .filter(function(ref) {
-                if(ref.indexOf('.map') === -1) {
+            .filter(function (ref) {
+                if (ref.indexOf('.map') === -1) {
                     return true;
                 }
             })
-            .map(function(ref) {
+            .map(function (ref) {
                 return paths.serverDir + ref;
             })
-            .value()
+            .value();
                     
         return gulp.src(_.flatten([paths.modules, projectReferenes, projectDir + '.tmp/' + paths.templateCache]))
             .pipe($.sourcemaps.init({ loadMaps: true }))
@@ -69,31 +70,44 @@ module.exports = function (projectDir, paths) {
             .pipe(gulp.dest(paths.build + 'scripts'));
     });
     
+    gulp.task('build-vendor-css', function () {
+        return gulp.src(paths.vendorcss)
+            .pipe($.concat('vendor.css'))
+            .pipe($.bytediff.start())
+            .pipe($.csso())
+            .pipe($.bytediff.stop(bytediffFormatter))
+            .pipe($.replace('ui-grid.svg', '../fonts/ui-grid.svg'))
+            .pipe($.replace('ui-grid.woff', '../fonts/ui-grid.woff'))
+            .pipe($.replace('styles/fonts', 'fonts'))
+            .pipe($.replace('../../../bower_components/bootstrap/fonts', '../fonts'))
+            .pipe(gulp.dest(paths.build + 'styles'));
+    });
+    
+    gulp.task('build-app-css', ['styles'], function () {
+        return gulp.src(paths.projectcss)
+            .pipe($.concat('main.css'))
+            .pipe($.bytediff.start())
+            .pipe($.csso())
+            .pipe($.bytediff.stop(bytediffFormatter))
+            .pipe(gulp.dest(paths.build + 'styles'));
+    });
+    
 
-    gulp.task('html', ['build-vendor-js', 'build-app-js'], function () {
+    // gulp.task('html', function () {
+    gulp.task('html', ['build-vendor-js', 'build-app-js', 'build-vendor-css', 'build-app-css'], function () {
         var jsFilter = $.filter('**/*.js');
         var cssFilter = $.filter('**/*.css');
         var assets;
 
         return gulp.src(paths.index)
-            .pipe(assets = $.useref.assets({searchPath: paths.userefSearchPaths, noconcat: true}))
-            //Filter out all JS because we're handling vendor.js and app.js manually above
+            .pipe(assets = $.useref.assets({searchPath: paths.userefSearchPaths}))
+
+            //Filter out all CSS & JS because we're handling 
+            // manually above
+            .pipe(cssFilter)
             .pipe(jsFilter)
 
-            .pipe(cssFilter)
-            //TODO Create a regexp to replace all font in ui-grid
-            .pipe($.bytediff.start())
-            .pipe($.csso())
-            .pipe($.replace('ui-grid.svg', '../fonts/ui-grid.svg'))
-            .pipe($.replace('ui-grid.woff', '../fonts/ui-grid.woff'))
-            .pipe($.replace('styles/fonts', 'fonts'))
-            //.pipe($.replace('bower_components/font-awesome/fonts', 'fonts'))
-            .pipe($.replace('../../../bower_components/bootstrap/fonts', '../fonts'))
-            //.pipe($.replace('bower_components/font-awesome/fonts', 'fonts'))
-            .pipe($.bytediff.stop(bytediffFormatter))
-            .pipe(cssFilter.restore())
-
-            .pipe(assets.restore())
+            // .pipe(assets.restore())
             .pipe($.useref())
             .pipe(gulp.dest(paths.build))
             .pipe($.size());
