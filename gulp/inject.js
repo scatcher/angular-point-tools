@@ -31,54 +31,6 @@ module.exports = function(projectDir, paths) {
             .pipe(gulp.dest(paths.app));
     });
 
-
-
-    gulp.task('inject-dist', ['styles', 'inject-ts', 'templatecache'], function () {
-        var googlecdn = require('gulp-google-cdn');
-
-        return gulp.src(paths.appDir + 'index.html')
-            .pipe(injectRelative('vendorjs'))
-            .pipe(injectRelative('cdnjs'))
-            .pipe(injectNG('environmentjs', {src: paths.distjs}))
-        /** Replace local references with Google CDN references */
-            .pipe(googlecdn(paths.bower.json))
-            .pipe(injectNG('projectjs'))
-            .pipe(injectNG('modules'))
-        /** Replace local jquery-ui css with cdn */
-            .pipe($.replace('href="bower_components/jquery-ui',
-                'href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0'))
-            .pipe(injectRelative('projectcss'))
-            .pipe(injectRelative('vendorcss'))
-            .pipe(gulp.dest(paths.app));
-    });
-
-
-    //function injectModuleDependencies(mode) {
-    //    var dependencies;
-    //
-    //    switch(mode) {
-    //        case 'dev':
-    //            dependencies = [].concat(paths.appDependencies, paths.devDependencies);
-    //            break;
-    //        case 'dist':
-    //            dependencies = paths.appDependencies;
-    //            break;
-    //    }
-    //
-    //    if(dependencies) {
-    //        var target = gulp.src(paths.appModule);
-    //        //var sources = gulp.src(paths.tsFiles, {read: false});
-    //        return target.pipe($.inject(dependencies, {
-    //            starttag: '//{',
-    //            endtag: '//}',
-    //            transform: function (moduleName) {
-    //                return '"' + moduleName + '"';
-    //            }
-    //        })).pipe(gulp.dest('./'));
-    //    }
-    //}
-
-
     /**
      * @name injectNG
      * @description Looks for a named JS block in index.html and inserts links to all matching

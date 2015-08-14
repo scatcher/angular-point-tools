@@ -11,7 +11,7 @@ var $ = require('gulp-load-plugins')({
 var log = $.util.log;
 
 module.exports = function (projectDir, paths) {
-    
+
     gulp.task('build', [
         'html',
         'images',
@@ -27,27 +27,27 @@ module.exports = function (projectDir, paths) {
         log('Creating an AngularJS $templateCache');
         return gulp
             .src(paths.htmltemplates)
-            // .pipe($.bytediff.start())
-            .pipe($.minifyHtml({empty: true}))
+        // .pipe($.bytediff.start())
+            .pipe($.minifyHtml({ empty: true }))
             .pipe($.angularTemplatecache(paths.templateCache, {
                 module: paths.templatesModule,
                 standalone: true,
                 root: ''
             }))
-            // .pipe($.bytediff.stop(bytediffFormatter))
+        // .pipe($.bytediff.stop(bytediffFormatter))
             .pipe(gulp.dest(projectDir + '.tmp'));
     });
-    
+
     gulp.task('build-vendor-js', function () {
         return gulp.src(paths.vendorjs)
             .pipe($.sourcemaps.init({ loadMaps: true }))
             .pipe($.concat('vendor.js'))
-            .pipe($.uglify({mangle: true}))
+            .pipe($.uglify({ mangle: true }))
             .pipe($.sourcemaps.write('.'))
             .pipe(gulp.dest(paths.build + 'scripts'));
     });
-   
-    
+
+
     gulp.task('build-app-js', ['ts', 'templatecache'], function () {
         var sortOutput = require(paths.tmpDir + paths.tsSortOutputName);
         var projectReferenes = _.chain(sortOutput)
@@ -60,16 +60,16 @@ module.exports = function (projectDir, paths) {
                 return paths.serverDir + ref;
             })
             .value();
-                    
+
         return gulp.src(_.flatten([paths.modules, projectReferenes, projectDir + '.tmp/' + paths.templateCache]))
             .pipe($.sourcemaps.init({ loadMaps: true }))
-            // .pipe($.ngAnnotate())
+        // .pipe($.ngAnnotate())
             .pipe($.concat('scripts.js'))
-            // .pipe($.uglify({mangle: true}))
+        // .pipe($.uglify({mangle: true}))
             .pipe($.sourcemaps.write('.'))
             .pipe(gulp.dest(paths.build + 'scripts'));
     });
-    
+
     gulp.task('build-vendor-css', function () {
         return gulp.src(paths.vendorcss)
             .pipe($.concat('vendor.css'))
@@ -82,7 +82,7 @@ module.exports = function (projectDir, paths) {
             .pipe($.replace('../../../bower_components/bootstrap/fonts', '../fonts'))
             .pipe(gulp.dest(paths.build + 'styles'));
     });
-    
+
     gulp.task('build-app-css', ['styles'], function () {
         return gulp.src(paths.projectcss)
             .pipe($.concat('main.css'))
@@ -91,26 +91,36 @@ module.exports = function (projectDir, paths) {
             .pipe($.bytediff.stop(bytediffFormatter))
             .pipe(gulp.dest(paths.build + 'styles'));
     });
-    
 
-    // gulp.task('html', function () {
     gulp.task('html', ['build-vendor-js', 'build-app-js', 'build-vendor-css', 'build-app-css'], function () {
-        var jsFilter = $.filter('**/*.js');
-        var cssFilter = $.filter('**/*.css');
+        // var jsFilter = $.filter('**/*.js');
+        // var cssFilter = $.filter('**/*.css');
+        var googlecdn = require('gulp-google-cdn');
         var assets;
 
         return gulp.src(paths.index)
-            .pipe(assets = $.useref.assets({searchPath: paths.userefSearchPaths}))
+            .pipe(googlecdn(paths.bower.json))
+        /** Replace local jquery-ui css with cdn */
+            .pipe($.replace('href="bower_components/jquery-ui',
+                'href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0'))
+            
+            //Need to specify https because SharePoint occasionally tries to make
+            //all CDN links relative which breaks everything
+            .pipe($.replace('"//', '"https://'))
+
+            //Intentionally don't pass it any files so it will clear our all 
+            //existing refs
+            .pipe(assets = $.useref.assets())
 
             //Filter out all CSS & JS because we're handling 
             // manually above
-            .pipe(cssFilter)
-            .pipe(jsFilter)
+            // .pipe(cssFilter)
+            // .pipe(jsFilter)
 
-            // .pipe(assets.restore())
+            .pipe(assets.restore())
             .pipe($.useref())
-            .pipe(gulp.dest(paths.build))
-            .pipe($.size());
+            .pipe(gulp.dest(paths.build));
+        // .pipe($.size());
     });
 
     gulp.task('uglify-vendor-js', function () {
@@ -122,7 +132,7 @@ module.exports = function (projectDir, paths) {
     });
 
 
-////////////////
+    ////////////////
 
     /**
      * Formatter for bytediff to display the size changes after processing

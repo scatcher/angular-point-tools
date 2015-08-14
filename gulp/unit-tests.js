@@ -45,13 +45,13 @@ module.exports = function (projectDir, paths) {
         });
     }
 
-    gulp.task('test', ['ts', 'ts-test', 'cacheXML'], function (done) {
+    gulp.task('test', ['ts', 'ts-test'], function (done) {
         runTests(true, done);
     });
-    gulp.task('test:auto', ['watch-ts', 'cacheXML'], function (done) {
+    gulp.task('test:auto', ['watch-ts'], function (done) {
         runTests(false, done);
     });
-    gulp.task('test:debug', ['watch-ts', 'cacheXML'], function (done) {
+    gulp.task('test:debug', ['watch-ts'], function (done) {
         runTests(false, done, {browsers:['Chrome']});
     });
 };
