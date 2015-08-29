@@ -15,8 +15,7 @@ module.exports = function (projectDir, paths) {
     gulp.task('build', [
         'html',
         'images',
-        'fonts',
-        'bump'
+        'fonts'
     ]);
 
     /**
