@@ -35,8 +35,8 @@ module.exports = function (projectDir, paths) {
     }
 
     function runTests(singleRun, done, options) {
-        listFiles(function (files) {
-            karma.server.start(_.extend({}, {
+        return listFiles(function (files) {
+            return karma.server.start(_.extend({}, {
                 configFile: projectDir + 'karma.conf.js',
                 files: files,
                 singleRun: singleRun,
@@ -46,12 +46,12 @@ module.exports = function (projectDir, paths) {
     }
 
     gulp.task('test', ['ts', 'ts-test'], function (done) {
-        runTests(true, done);
+        return runTests(true, done);
     });
     gulp.task('test:auto', ['watch-ts'], function (done) {
-        runTests(false, done);
+        return runTests(false, done);
     });
     gulp.task('test:debug', ['watch-ts'], function (done) {
-        runTests(false, done, {browsers:['Chrome']});
+        return runTests(false, done, {browsers:['Chrome']});
     });
 };
