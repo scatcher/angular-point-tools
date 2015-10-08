@@ -64,7 +64,8 @@ module.exports = function (projectDir, paths) {
             .pipe($.sourcemaps.init({ loadMaps: true }))
         // .pipe($.ngAnnotate())
             .pipe($.concat('scripts.js'))
-        // .pipe($.uglify({mangle: true}))
+            //Min JS but don't mangle so we don't break our angular DI
+            .pipe($.uglify({mangle: true, preserveComments: true}))
             .pipe($.sourcemaps.write('.'))
             .pipe(gulp.dest(paths.build + 'scripts'));
     });
