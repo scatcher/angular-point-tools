@@ -62,10 +62,9 @@ module.exports = function (projectDir, paths) {
 
         return gulp.src(_.flatten([paths.modules, projectReferenes, projectDir + '.tmp/' + paths.templateCache]))
             .pipe($.sourcemaps.init({ loadMaps: true }))
-        // .pipe($.ngAnnotate())
             .pipe($.concat('scripts.js'))
             //Min JS but don't mangle so we don't break our angular DI
-            .pipe($.uglify({mangle: true, preserveComments: true}))
+            .pipe($.uglify({mangle: false, preserveComments: true}))
             .pipe($.sourcemaps.write('.'))
             .pipe(gulp.dest(paths.build + 'scripts'));
     });
